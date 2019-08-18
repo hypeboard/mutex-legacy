@@ -448,30 +448,23 @@ namespace nodetool
     std::set<std::string> full_addrs;
     if (nettype == cryptonote::TESTNET)
     {
-      full_addrs.insert("212.83.175.67:28080");
-      full_addrs.insert("5.9.100.248:28080");
-      full_addrs.insert("163.172.182.165:28080");
-      full_addrs.insert("195.154.123.123:28080");
       full_addrs.insert("212.83.172.165:28080");
     }
     else if (nettype == cryptonote::STAGENET)
     {
       full_addrs.insert("162.210.173.150:38080");
-      full_addrs.insert("162.210.173.151:38080");
+
     }
     else if (nettype == cryptonote::FAKECHAIN)
     {
     }
     else
     {
-      full_addrs.insert("107.152.130.98:18080");
-      full_addrs.insert("212.83.175.67:18080");
-      full_addrs.insert("5.9.100.248:18080");
-      full_addrs.insert("163.172.182.165:18080");
-      full_addrs.insert("161.67.132.39:18080");
-      full_addrs.insert("198.74.231.92:18080");
-      full_addrs.insert("195.154.123.123:18080");
-      full_addrs.insert("212.83.172.165:18080");
+      full_addrs.insert("35.172.245.22:26942"); // seed 1
+      full_addrs.insert("35.168.54.62:26942"); // blocknet 1
+      full_addrs.insert("3.90.100.66:26942"); // blocknet 2
+      full_addrs.insert("34.232.227.76:26942"); // blocknet 3
+      full_addrs.insert("193.37.138.146:26942"); // alxx.matxxxxx
     }
     return full_addrs;
   }

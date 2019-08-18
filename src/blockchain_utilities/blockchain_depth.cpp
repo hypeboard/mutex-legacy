@@ -97,12 +97,12 @@ int main(int argc, char* argv[])
 
   if (command_line::get_arg(vm, command_line::arg_help))
   {
-    std::cout << "Monero '" << MONERO_RELEASE_NAME << "' (v" << MONERO_VERSION_FULL << ")" << ENDL << ENDL;
+    std::cout << "Mutex '" << MONERO_RELEASE_NAME << "' (v" << MONERO_VERSION_FULL << ")" << ENDL << ENDL;
     std::cout << desc_options << std::endl;
     return 1;
   }
 
-  mlog_configure(mlog_get_default_log_path("monero-blockchain-depth.log"), true);
+  mlog_configure(mlog_get_default_log_path("mutex-blockchain-depth.log"), true);
   if (!command_line::is_arg_defaulted(vm, arg_log_level))
     mlog_set_log(command_line::get_arg(vm, arg_log_level).c_str());
   else
@@ -151,7 +151,7 @@ int main(int argc, char* argv[])
   //   Blockchain* core_storage = new Blockchain(NULL);
   // because unlike blockchain_storage constructor, which takes a pointer to
   // tx_memory_pool, Blockchain's constructor takes tx_memory_pool object.
-  LOG_PRINT_L0("Initializing source blockchain (BlockchainDB)");
+  LOG_PRINT_L0("Initializing source chain data partition...)");
   std::unique_ptr<Blockchain> core_storage;
   tx_memory_pool m_mempool(*core_storage);
   core_storage.reset(new Blockchain(m_mempool));

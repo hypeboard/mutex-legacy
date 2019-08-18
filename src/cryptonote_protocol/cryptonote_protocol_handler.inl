@@ -2067,10 +2067,54 @@ skip:
     bool val_expected = false;
     if(m_synchronized.compare_exchange_strong(val_expected, true))
     {
-      MGINFO_YELLOW(ENDL << "**********************************************************************" << ENDL
-        << "You are now synchronized with the network. You may now start monero-wallet-cli." << ENDL
+      MGINFO_MAGENTA(ENDL
+        << "******************************************************************************" << ENDL
+        << ENDL 
         << ENDL
+        << "           -..`                                 ``.--            " << ENDL
+        << "        -::-:-..`                            `..-:-::-           " << ENDL
+        << "      `-/::------.. `                    ``..------::/-`         " << ENDL
+        << "      ::::::::::-..---.`---.--`.--.-:-`.---..-::::::::::         " << ENDL
+        << "     `/:::::/:+///:-.---:::////////:::--..-:///+:/:::::/`        " << ENDL
+        << "     -++::://+oo+++/`.----.-:/::/:-`----.`/+++oo+//:::++-        " << ENDL
+        << "    `:++/::+oo++/++/-....-.-.----.:.-....-/++/++oo+::/++:        " << ENDL
+        << "    `-/++//://+oooo:..``./+::-..-::+/-``..:oooo+//://++/-`       " << ENDL
+        << "    `::ooo+//++oo+/:-:/+os+://////:+so+/:-:/++o++//+ooo::`       " << ENDL
+        << "    `:/+ss+///////oso++++//++++++++///+++oso///////+ss+/:`       " << ENDL
+        << "     ///so+/////+sssoo//++//++//++//++//oosss+/////+os///        " << ENDL
+        << "     ://++/////+sso+///+oo+////////+oo+///+oss+/////++//:        " << ENDL
+        << "     ./+++++////++++oooosoo/++//++/oosoooo++++////+++++/.        " << ENDL
+        << "     `///+o+:::+ooooossoooo//++++//oooossooooo+:::+o+///`        " << ENDL
+        << "   `-:::oo+/-:+sysooooooosy++oo++/+ysooooooosys+:-/+oo:::-`      " << ENDL
+        << "    -//+o+oso+ooso+o++//ssy+/++++/+yss//++o+osoo+osooo+//-       " << ENDL
+        << "  `--+ossossssso/++💎-:/so++o++o++os/:--💎++/osssssosso+--      " << ENDL
+        << "     -yssoo+o++ssyyys//:-/ssoyssyoss/-://syyyss++o+oossy-        " << ENDL
+        << "     -ooo+++oshdhysssyyss+ossyssysyoossyysssyhdhso+++ooo-        " << ENDL
+        << "    `ossyyhhdmmddhs+ssyyyyyhhhyyhhhyyyyyss+shddmmdhhyysso`       " << ENDL
+        << "    oyhhhddddmmmdddhyyyyyyhhhhyyhhhhyyyyyyhdddmmmddddhhhy+       " << ENDL
+        << "   .syyyhhdddmmmmmmmmmdddhhhhsssshhhhdddmmmmmmmmmdddhhyyys.      " << ENDL
+        << " `:/os+yhhddddddddmNmmmmmdhys++++syhdmmmmmmmddddddddyhy+so/:`    " << ENDL
+        << " `  .`  .:odddhyhydmmmmmmhyy+/::/+yyhmmmmmmdyhyhdddo:.  `.  `    " << ENDL
+        << "           -ysssyyydmmmmddyo/::::/oydmmmmmdyyysssy-              " << ENDL
+        << "            oyyyhhydddmmmds/++::+o/ydmmmddhhhhyyyo               " << ENDL
+        << "            :ssyhhhddsdmmdy/`    `/ydmmdsddhhhyss:               " << ENDL
+        << "            `:syhhhhhyshddds.    .sdddhsyhhhhhyo:`               " << ENDL
+        << "               -::::+so+yhhy:.``.:syys+os/::-:-                  " << ENDL
+        << "                      `..  .`    `.  `.`                         " << ENDL
+        << "                                                                 " << ENDL
+        << ENDL
+        << ENDL
+        << "        ███╗   ███╗██╗   ██╗████████╗███████╗██╗  ██╗  " << ENDL
+        << "        ████╗ ████║██║   ██║╚══██╔══╝██╔════╝╚██╗██╔╝  " << ENDL
+        << "        ██╔████╔██║██║   ██║   ██║   █████╗   ╚███╔╝   " << ENDL
+        << "        ██║╚██╔╝██║██║   ██║   ██║   ██╔══╝   ██╔██╗   " << ENDL
+        << "        ██║ ╚═╝ ██║╚██████╔╝   ██║   ███████╗██╔╝ ██╗  " << ENDL
+        << "        ╚═╝     ╚═╝ ╚═════╝    ╚═╝   ╚══════╝╚═╝  ╚═╝  " << ENDL
+        << "         Version 0.2.1: 'The Wolf of Mission Street'   " <<ENDL
+        << ENDL
+        << "Join our Discord at https://discord.gg/cK2Bang" << ENDL
         << "Use the \"help\" command to see the list of available commands." << ENDL
+        << "You are synchronized with the network. You may now start mutex-wallet-cli." << ENDL
         << "**********************************************************************");
       m_sync_timer.pause();
       if (ELPP->vRegistry()->allowed(el::Level::Info, "sync-info"))
