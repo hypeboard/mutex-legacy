@@ -2627,7 +2627,7 @@ bool Blockchain::check_tx_outputs(const transaction& tx, tx_verification_context
     }
   }
 
-  // // from v8, allow bulletproofs
+  // from v8, allow bulletproofs
   // if (hf_version < 8) {
   //   if (tx.version >= 2) {
   //     const bool bulletproof = rct::is_rct_bulletproof(tx.rct_signatures.type);

@@ -285,7 +285,7 @@ namespace tools
     {
       MINFO("The daemon is not set up to background mine.");
       MINFO("With background mining enabled, the daemon will mine when idle and not on batttery.");
-      MINFO("Enabling this supports the network you are using, and makes you eligible for receiving new monero");
+      MINFO("Enabling this supports the network you are using, and makes you eligible for receiving new Mutex");
       MINFO("Set setup-background-mining to 1 in monero-wallet-cli to change.");
       return;
     }

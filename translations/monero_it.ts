@@ -2095,7 +2095,7 @@ di nuovo il tuo portafoglio (le chiavi del tuo portafoglio NON sono in nessun ca
     </message>
     <message>
         <location filename="../src/simplewallet/simplewallet.cpp" line="4752"/>
-        <source>Enabling this supports the network you are using, and makes you eligible for receiving new monero</source>
+        <source>Enabling this supports the network you are using, and makes you eligible for receiving new Mutex</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

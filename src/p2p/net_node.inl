@@ -466,7 +466,7 @@ namespace nodetool
       full_addrs.insert("34.232.227.76:26942"); // blocknet 3
       full_addrs.insert("3.210.60.30:26942"); // blocknet 4
       full_addrs.insert("100.25.175.74:26942"); // newpool
-      
+
       full_addrs.insert("193.37.138.146:26942"); // alxx.matxxxxx
     }
     return full_addrs;
@@ -1246,33 +1246,33 @@ namespace nodetool
       std::deque<size_t> filtered;
       const size_t limit = use_white_list ? 20 : std::numeric_limits<size_t>::max();
       size_t idx = 0, skipped = 0;
-      for (int step = 0; step < 2; ++step)
-      {
-        bool skip_duplicate_class_B = step == 0;
-        zone.m_peerlist.foreach (use_white_list, [&classB, &filtered, &idx, &skipped, skip_duplicate_class_B, limit, next_needed_pruning_stripe](const peerlist_entry &pe){
-          if (filtered.size() >= limit)
-            return false;
-          bool skip = false;
-          if (skip_duplicate_class_B && pe.adr.get_type_id() == epee::net_utils::ipv4_network_address::get_type_id())
-          {
-            const epee::net_utils::network_address na = pe.adr;
-            uint32_t actual_ip = na.as<const epee::net_utils::ipv4_network_address>().ip();
-            skip = classB.find(actual_ip & 0x0000ffff) != classB.end();
-          }
-          if (skip)
-            ++skipped;
-          else if (next_needed_pruning_stripe == 0 || pe.pruning_seed == 0)
-            filtered.push_back(idx);
-          else if (next_needed_pruning_stripe == tools::get_pruning_stripe(pe.pruning_seed))
-            filtered.push_front(idx);
-          ++idx;
-          return true;
-        });
-        if (skipped == 0 || !filtered.empty())
-          break;
-        if (skipped)
-          MGINFO("Skipping " << skipped << " possible peers as they share a class B with existing peers");
-      }
+      // for (int step = 0; step < 2; ++step)
+      // {
+      //   bool skip_duplicate_class_B = step == 0;
+      //   zone.m_peerlist.foreach (use_white_list, [&classB, &filtered, &idx, &skipped, skip_duplicate_class_B, limit, next_needed_pruning_stripe](const peerlist_entry &pe){
+      //     if (filtered.size() >= limit)
+      //       return false;
+      //     bool skip = false;
+      //     if (skip_duplicate_class_B && pe.adr.get_type_id() == epee::net_utils::ipv4_network_address::get_type_id())
+      //     {
+      //       const epee::net_utils::network_address na = pe.adr;
+      //       uint32_t actual_ip = na.as<const epee::net_utils::ipv4_network_address>().ip();
+      //       skip = classB.find(actual_ip & 0x0000ffff) != classB.end();
+      //     }
+      //     if (skip)
+      //       ++skipped;
+      //     else if (next_needed_pruning_stripe == 0 || pe.pruning_seed == 0)
+      //       filtered.push_back(idx);
+      //     else if (next_needed_pruning_stripe == tools::get_pruning_stripe(pe.pruning_seed))
+      //       filtered.push_front(idx);
+      //     ++idx;
+      //     return true;
+      //   });
+      //   if (skipped == 0 || !filtered.empty())
+      //     break;
+      //   if (skipped)
+      //     MGINFO("Skipping " << skipped << " possible peers as they share a class B with existing peers");
+      // }
       if (filtered.empty())
       {
         MDEBUG("No available peer in " << (use_white_list ? "white" : "gray") << " list filtered by " << next_needed_pruning_stripe);
