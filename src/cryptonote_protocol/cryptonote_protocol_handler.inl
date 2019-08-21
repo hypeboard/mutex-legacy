@@ -1154,7 +1154,7 @@ namespace cryptonote
             MDEBUG(context << " no next span found, going back to download");
             break;
           }
-
+          
           if (blocks.empty())
           {
             MERROR(context << "Next span has no blocks");
@@ -1187,6 +1187,7 @@ namespace cryptonote
             m_block_queue.remove_spans(span_connection_id, start_height);
             continue;
           }
+          
           bool parent_known = m_core.have_block(new_block.prev_id);
           if (!parent_known)
           {
@@ -2442,7 +2443,7 @@ skip:
       MINFO("Target height decreasing from " << previous_target << " to " << target);
       m_core.set_target_blockchain_height(target);
       if (target == 0 && context.m_state > cryptonote_connection_context::state_before_handshake && !m_stopping)
-        MCWARNING("global", "monerod is now disconnected from the network");
+        MCWARNING("global", "The Mutex daemon is now disconnected from the network");
     }
 
     m_block_queue.flush_spans(context.m_connection_id, false);

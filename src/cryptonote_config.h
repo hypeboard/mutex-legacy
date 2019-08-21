@@ -52,7 +52,7 @@
 
 #define BLOCKCHAIN_TIMESTAMP_CHECK_WINDOW               60
 
-#define MONEY_SUPPLY                                    UINT64_C(1000000000000000000) // 1Billion
+#define MONEY_SUPPLY                                    UINT64_C(1010000000000000000) // 1Billion // 
 #define EMISSION_SPEED_FACTOR_PER_MINUTE                (20)
 #define FINAL_SUBSIDY_PER_MINUTE                        ((uint64_t)300000000) // 3 * 100000000 // ??pow(10, )
 
@@ -153,11 +153,11 @@
 
 #define HF_VERSION_DYNAMIC_FEE                  4
 #define HF_VERSION_MIN_MIXIN_4                  6
-#define HF_VERSION_MIN_MIXIN_6                  7
-#define HF_VERSION_MIN_MIXIN_10                 10
-#define HF_VERSION_ENFORCE_RCT                  6
+#define HF_VERSION_MIN_MIXIN_6                  9 // hold off on this
+#define HF_VERSION_MIN_MIXIN_10                 10 
+#define HF_VERSION_ENFORCE_RCT                  10
 #define HF_VERSION_PER_BYTE_FEE                 9
-#define HF_VERSION_SMALLER_BP                   10
+#define HF_VERSION_SMALLER_BP                   6 //10 allow small bulletproofs earlier
 #define HF_VERSION_LONG_TERM_BLOCK_WEIGHT       10
 
 #define PER_KB_FEE_QUANTIZATION_DECIMALS        8
