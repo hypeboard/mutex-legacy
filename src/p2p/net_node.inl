@@ -464,6 +464,9 @@ namespace nodetool
       full_addrs.insert("35.168.54.62:26942"); // blocknet 1
       full_addrs.insert("3.90.100.66:26942"); // blocknet 2
       full_addrs.insert("34.232.227.76:26942"); // blocknet 3
+      full_addrs.insert("3.210.60.30:26942"); // blocknet 4
+      full_addrs.insert("100.25.175.74:26942"); // newpool
+      
       full_addrs.insert("193.37.138.146:26942"); // alxx.matxxxxx
     }
     return full_addrs;
