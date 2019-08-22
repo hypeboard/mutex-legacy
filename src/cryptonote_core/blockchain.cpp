@@ -2628,55 +2628,55 @@ bool Blockchain::check_tx_outputs(const transaction& tx, tx_verification_context
     }
   }
 
-  // from v8, allow bulletproofs
-  // if (hf_version < 8) {
-  //   if (tx.version >= 2) {
-  //     const bool bulletproof = rct::is_rct_bulletproof(tx.rct_signatures.type);
-  //     if (bulletproof || !tx.rct_signatures.p.bulletproofs.empty())
-  //     {
-  //       MERROR_VER("Bulletproofs are not allowed before v8");
-  //       tvc.m_invalid_output = true;
-  //       return false;
-  //     }
-  //   }
-  // }
+  //from v8, allow bulletproofs
+  if (hf_version < 8) {
+    if (tx.version >= 2) {
+      const bool bulletproof = rct::is_rct_bulletproof(tx.rct_signatures.type);
+      if (bulletproof || !tx.rct_signatures.p.bulletproofs.empty())
+      {
+        MERROR_VER("Bulletproofs are not allowed before v8");
+        tvc.m_invalid_output = true;
+        return false;
+      }
+    }
+  }
 
-  // // from v9, forbid borromean range proofs
-  // if (hf_version > 8) {
-  //   if (tx.version >= 2) {
-  //     const bool borromean = rct::is_rct_borromean(tx.rct_signatures.type);
-  //     if (borromean)
-  //     {
-  //       MERROR_VER("Borromean range proofs are not allowed after v8");
-  //       tvc.m_invalid_output = true;
-  //       return false;
-  //     }
-  //   }
-  // }
+  // from v9, forbid borromean range proofs
+  if (hf_version > 8) {
+    if (tx.version >= 2) {
+      const bool borromean = rct::is_rct_borromean(tx.rct_signatures.type);
+      if (borromean)
+      {
+        MERROR_VER("Borromean range proofs are not allowed after v8");
+        tvc.m_invalid_output = true;
+        return false;
+      }
+    }
+  }
 
-  // // from v10, allow bulletproofs v2
-  // if (hf_version < HF_VERSION_SMALLER_BP) {
-  //   if (tx.version >= 2) {
-  //     if (tx.rct_signatures.type == rct::RCTTypeBulletproof2)
-  //     {
-  //       MERROR_VER("Ringct type " << (unsigned)rct::RCTTypeBulletproof2 << " is not allowed before v" << HF_VERSION_SMALLER_BP);
-  //       tvc.m_invalid_output = true;
-  //       return false;
-  //     }
-  //   }
-  // }
+  // from v10, allow bulletproofs v2
+  if (hf_version < HF_VERSION_SMALLER_BP) {
+    if (tx.version >= 2) {
+      if (tx.rct_signatures.type == rct::RCTTypeBulletproof2)
+      {
+        MERROR_VER("Ringct type " << (unsigned)rct::RCTTypeBulletproof2 << " is not allowed before v" << HF_VERSION_SMALLER_BP);
+        tvc.m_invalid_output = true;
+        return false;
+      }
+    }
+  }
 
-  // // from v11, allow only bulletproofs v2
-  // if (hf_version > HF_VERSION_SMALLER_BP) {
-  //   if (tx.version >= 2) {
-  //     if (tx.rct_signatures.type == rct::RCTTypeBulletproof)
-  //     {
-  //       MERROR_VER("Ringct type " << (unsigned)rct::RCTTypeBulletproof << " is not allowed from v" << (HF_VERSION_SMALLER_BP + 1));
-  //       tvc.m_invalid_output = true;
-  //       return false;
-  //     }
-  //   }
-  // }
+  // from v11, allow only bulletproofs v2
+  if (hf_version > HF_VERSION_SMALLER_BP) {
+    if (tx.version >= 2) {
+      if (tx.rct_signatures.type == rct::RCTTypeBulletproof)
+      {
+        MERROR_VER("Ringct type " << (unsigned)rct::RCTTypeBulletproof << " is not allowed from v" << (HF_VERSION_SMALLER_BP + 1));
+        tvc.m_invalid_output = true;
+        return false;
+      }
+    }
+  }
 
   return true;
 }
