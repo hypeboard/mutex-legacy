@@ -93,7 +93,7 @@ static const struct {
   { 1, 1, 0, 1341378000 },
   { 7, 2, 0, 1521303150 },
   { 8, 100000, 0, 1529884800 },
-  { 11, 1100000, 0, 1567296000 }, // 09/01/2019 @ 12:00am (UTC)
+  { 11, 690200, 0, 1567296000 }, // 09/01/2019 @ 12:00am (UTC)
 };
 static const uint64_t mainnet_hard_fork_version_1_till = 2;
 
@@ -907,9 +907,7 @@ difficulty_type Blockchain::get_difficulty_for_next_block()
   }
   size_t target = DIFFICULTY_TARGET_V2;
 	
-  if (version >= 11) {
-    diff = next_difficulty_v5(timestamps, difficulties, T, N, HEIGHT, FORK_HEIGHT, difficulty_guess);
-  } else if (version < 8) {
+  if (version < 8) {
     return next_difficulty(timestamps, difficulties, target);
   } else {
     return next_difficulty_v2(timestamps, difficulties, target);
