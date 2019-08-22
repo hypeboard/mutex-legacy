@@ -93,7 +93,7 @@ static const struct {
   { 1, 1, 0, 1341378000 },
   { 7, 2, 0, 1521303150 },
   { 8, 100000, 0, 1529884800 },
-  // { 9, 689200, 0, 1566432000 },
+  { 11, 1100000, 0, 1567296000 }, // 09/01/2019 @ 12:00am (UTC)
 };
 static const uint64_t mainnet_hard_fork_version_1_till = 2;
 
@@ -107,6 +107,7 @@ static const struct {
   { 1, 1, 0, 1341378000 },
   { 7, 2, 0, 1519605000 },
   { 8, 100, 0, 1523255371 },
+  { 11, 500, 0, 1533255371 },
 };
 static const uint64_t testnet_hard_fork_version_1_till = 2;
 
