@@ -979,8 +979,18 @@ namespace cryptonote
     }
     const account_public_address& lMiningAdr = lMiner.get_mining_address();
     res.address = get_account_address_as_str(nettype(), false, lMiningAdr);
-    const uint8_t major_version = m_core.get_blockchain_storage().get_current_hard_fork_version();
-    const unsigned variant = major_version >= 7 ? major_version - 6 : 0;
+    const uint8_t hf_version = m_core.get_blockchain_storage().get_current_hard_fork_version();
+    auto get_variant=[](int hf_version){
+      if (hf_version < 7) {
+        return 0;
+      } else if ((hf_version == 7) || (hf_version == 8)){
+        return 7;
+      } else {
+        return 9;
+      }
+    };
+    const unsigned variant=get_variant(hf_version);
+
     switch (variant)
     {
       case 0: res.pow_algorithm = "Cryptonight"; break;
