@@ -984,9 +984,9 @@ namespace cryptonote
       if (hf_version < 7) {
         return 0;
       } else if ((hf_version == 7) || (hf_version == 8)){
-        return 7;
+        return 1;
       } else {
-        return 9;
+        return 7;
       }
     };
     const unsigned variant=get_variant(hf_version);

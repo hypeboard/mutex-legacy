@@ -686,9 +686,9 @@ namespace cryptonote
       if (hf_version < 7) {
         return 0;
       } else if ((hf_version == 7) || (hf_version == 8)){
-        return 7;
+        return 6;
       } else {
-        return 9;
+        return 7;
       }
     };
     const int pow_variant = get_variant(b.major_version);

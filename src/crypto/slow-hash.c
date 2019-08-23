@@ -42,7 +42,7 @@
 #include "variant4_random_math.h"
 #include "CryptonightR_JIT.h"
 
-#include <errno.h>å
+#include <errno.h>
 
 #define MEMORY         (1 << 21) // 2MB scratchpad
 #define ITER           (1 << 20)
