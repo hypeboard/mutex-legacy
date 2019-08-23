@@ -151,7 +151,7 @@ int main(int argc, char* argv[])
   //   Blockchain* core_storage = new Blockchain(NULL);
   // because unlike blockchain_storage constructor, which takes a pointer to
   // tx_memory_pool, Blockchain's constructor takes tx_memory_pool object.
-  LOG_PRINT_L0("Initializing source chain data partition...)");
+  LOG_PRINT_L0("Initializing source blockchain (BlockchainDB)");
   std::unique_ptr<Blockchain> core_storage;
   tx_memory_pool m_mempool(*core_storage);
   core_storage.reset(new Blockchain(m_mempool));

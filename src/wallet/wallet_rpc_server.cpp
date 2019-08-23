@@ -285,7 +285,7 @@ namespace tools
     {
       MINFO("The daemon is not set up to background mine.");
       MINFO("With background mining enabled, the daemon will mine when idle and not on batttery.");
-      MINFO("Enabling this supports the network you are using, and makes you eligible for receiving new Mutex");
+      MINFO("Enabling this supports the network you are using, and makes you eligible for receiving new monero");
       MINFO("Set setup-background-mining to 1 in monero-wallet-cli to change.");
       return;
     }
@@ -1811,14 +1811,12 @@ namespace tools
     wallet2::transfer_container transfers;
     m_wallet->get_transfers(transfers);
 
-    bool transfers_found = false;
     for (const auto& td : transfers)
     {
       if (!filter || available != td.m_spent)
       {
         if (req.account_index != td.m_subaddr_index.major || (!req.subaddr_indices.empty() && req.subaddr_indices.count(td.m_subaddr_index.minor) == 0))
           continue;
-        transfers_found = true;
         wallet_rpc::transfer_details rpc_transfers;
         rpc_transfers.amount       = td.amount();
         rpc_transfers.spent        = td.m_spent;
@@ -2104,7 +2102,12 @@ namespace tools
       return false;
     }
 
-    res.value = m_wallet->get_attribute(req.key);
+    if (!m_wallet->get_attribute(req.key, res.value))
+    {
+      er.code = WALLET_RPC_ERROR_CODE_ATTRIBUTE_NOT_FOUND;
+      er.message = "Attribute not found.";
+      return false;
+    }
     return true;
   }
   bool wallet_rpc_server::on_get_tx_key(const wallet_rpc::COMMAND_RPC_GET_TX_KEY::request& req, wallet_rpc::COMMAND_RPC_GET_TX_KEY::response& res, epee::json_rpc::error& er, const connection_context *ctx)

@@ -128,6 +128,7 @@ namespace cryptonote {
       cumulative_difficulties.resize(DIFFICULTY_WINDOW);
     }
 
+
     size_t length = timestamps.size();
     assert(length == cumulative_difficulties.size());
     if (length <= 1) {

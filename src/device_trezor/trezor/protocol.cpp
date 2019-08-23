@@ -27,6 +27,7 @@
 // THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
+#include "version.h"
 #include "protocol.hpp"
 #include <unordered_map>
 #include <set>
@@ -389,7 +390,7 @@ namespace tx {
 
   void Signer::extract_payment_id(){
     const std::vector<uint8_t>& tx_extra = cur_tx().extra;
-    m_ct.tsx_data.set_payment_id("");
+    // m_ct.tsx_data.set_payment_id("");
 
     std::vector<cryptonote::tx_extra_field> tx_extra_fields;
     cryptonote::parse_tx_extra(tx_extra, tx_extra_fields); // ok if partially parsed
@@ -401,11 +402,11 @@ namespace tx {
       ::crypto::hash8 payment_id8{};
       if(cryptonote::get_encrypted_payment_id_from_tx_extra_nonce(extra_nonce.nonce, payment_id8))
       {
-        m_ct.tsx_data.set_payment_id(std::string(payment_id8.data, 8));
+        // m_ct.tsx_data.set_payment_id(std::string(payment_id8.data, 8));
       }
       else if (cryptonote::get_payment_id_from_tx_extra_nonce(extra_nonce.nonce, payment_id))
       {
-        m_ct.tsx_data.set_payment_id(std::string(payment_id.data, 32));
+        // m_ct.tsx_data.set_payment_id(std::string(payment_id.data, 32));
       }
     }
   }
@@ -502,6 +503,8 @@ namespace tx {
     tsx_data.set_num_inputs(static_cast<google::protobuf::uint32>(tx.sources.size()));
     tsx_data.set_mixin(static_cast<google::protobuf::uint32>(tx.sources[0].outputs.size() - 1));
     tsx_data.set_account(tx.subaddr_account);
+    // tsx_data.set_monero_version(std::string(MONERO_VERSION) + "|" + MONERO_VERSION_TAG);
+    // tsx_data.set_hard_fork(m_aux_data->hard_fork ? m_aux_data->hard_fork.get() : 0);
     assign_to_repeatable(tsx_data.mutable_minor_indices(), tx.subaddr_indices.begin(), tx.subaddr_indices.end());
 
     // Rsig decision

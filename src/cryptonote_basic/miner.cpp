@@ -101,7 +101,7 @@ namespace cryptonote
   }
 
 
-  miner::miner(i_miner_handler* phandler, Blockchain* pbc):m_stop(1)
+  miner::miner(i_miner_handler* phandler, Blockchain* pbc):m_stop(1),
     m_template(boost::value_initialized<block>()),
     m_template_no(0),
     m_diffic(0),
@@ -475,7 +475,7 @@ namespace cryptonote
     for(; bl.nonce != std::numeric_limits<uint32_t>::max(); bl.nonce++)
     {
       crypto::hash h;
-       get_block_longhash(pbc, bl, h, height, tools::get_max_concurrency());
+      get_block_longhash(pbc, bl, h, height, tools::get_max_concurrency());
 
       if(check_hash(h, diffic))
       {
