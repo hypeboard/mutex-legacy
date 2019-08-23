@@ -52,7 +52,7 @@
 
 #define BLOCKCHAIN_TIMESTAMP_CHECK_WINDOW               60
 
-#define MONEY_SUPPLY                                    UINT64_C(1000000000000000000) // 1Billion // 1010000000000000000
+#define MONEY_SUPPLY                                    UINT64_C(1010000000000000000) // 1Billion // 1010000000000000000
 #define EMISSION_SPEED_FACTOR_PER_MINUTE                (20)
 #define FINAL_SUBSIDY_PER_MINUTE                        ((uint64_t)300000000) // 3 * 100000000 // ??pow(10, )
 
