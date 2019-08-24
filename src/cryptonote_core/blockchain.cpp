@@ -924,9 +924,8 @@ difficulty_type Blockchain::get_difficulty_for_next_block()
 
   difficulty_type diff = next_difficulty(timestamps, difficulties, target);
   if (version > 7) {
-    return next_difficulty_v2(timestamps, difficulties, target);
+    diff = next_difficulty_v2(timestamps, difficulties, target);
   }
-
 
   CRITICAL_REGION_LOCAL1(m_difficulty_lock);
   m_difficulty_for_next_block_top_hash = top_hash;
