@@ -924,7 +924,7 @@ difficulty_type Blockchain::get_difficulty_for_next_block()
 
   difficulty_type diff = next_difficulty(timestamps, difficulties, target);
   if (version > 7) {
-    return next_difficulty_v2(timestamps, cumulative_difficulties, target);
+    return next_difficulty_v2(timestamps, difficulties, target);
   }
 
 
