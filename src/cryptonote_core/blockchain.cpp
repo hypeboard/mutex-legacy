@@ -872,10 +872,10 @@ difficulty_type Blockchain::get_difficulty_for_next_block()
 
   uint8_t version = get_current_hard_fork_version();
   size_t difficulty_blocks_count;
-  if (version < 8) {
-    difficulty_blocks_count = DIFFICULTY_BLOCKS_COUNT;
-  } else {
+  if (version > 7) {
     difficulty_blocks_count = DIFFICULTY_BLOCKS_COUNT_V2;
+  } else {
+    difficulty_blocks_count = DIFFICULTY_BLOCKS_COUNT;
   }
   // ND: Speedup
   // 1. Keep a list of the last 735 (or less) blocks that is used to compute difficulty,
@@ -1107,10 +1107,10 @@ difficulty_type Blockchain::get_next_difficulty_for_alternative_chain(const std:
   std::vector<difficulty_type> cumulative_difficulties;
   uint8_t version = get_current_hard_fork_version();
   size_t difficulty_blocks_count;
-  if (version < 8) {
-    difficulty_blocks_count = DIFFICULTY_BLOCKS_COUNT;
+  if (version > 7) {
+   difficulty_blocks_count = DIFFICULTY_BLOCKS_COUNT_V2;
   } else {
-    difficulty_blocks_count = DIFFICULTY_BLOCKS_COUNT_V2;
+    difficulty_blocks_count = DIFFICULTY_BLOCKS_COUNT;
   }
   // if the alt chain isn't long enough to calculate the difficulty target
   // based on its blocks alone, need to get more blocks from the main chain
@@ -1120,7 +1120,7 @@ difficulty_type Blockchain::get_next_difficulty_for_alternative_chain(const std:
 
     // Figure out start and stop offsets for main chain blocks
     size_t main_chain_stop_offset = alt_chain.size() ? alt_chain.front().height : bei.height;
-    size_t main_chain_count = DIFFICULTY_BLOCKS_COUNT - std::min(static_cast<size_t>(DIFFICULTY_BLOCKS_COUNT), alt_chain.size());
+    size_t main_chain_count = difficulty_blocks_count - std::min(static_cast<size_t>(difficulty_blocks_count), alt_chain.size());
     main_chain_count = std::min(main_chain_count, main_chain_stop_offset);
     size_t main_chain_start_offset = main_chain_stop_offset - main_chain_count;
 
@@ -1166,10 +1166,10 @@ difficulty_type Blockchain::get_next_difficulty_for_alternative_chain(const std:
   size_t target = get_ideal_hard_fork_version(bei.height) < 2 ? DIFFICULTY_TARGET_V1 : DIFFICULTY_TARGET_V2;
 
   // calculate the difficulty target for the block and return it
-  if (version < 8) {
-    return next_difficulty(timestamps, cumulative_difficulties, target);
-  } else {
+  if (version > 7) {
     return next_difficulty_v2(timestamps, cumulative_difficulties, target);
+  } else {
+    return next_difficulty(timestamps, cumulative_difficulties, target);
   }
 }
 //------------------------------------------------------------------
@@ -1208,17 +1208,11 @@ bool Blockchain::prevalidate_miner_transaction(const block& b, uint64_t height)
 bool Blockchain::validate_miner_transaction(const block& b, size_t cumulative_block_weight, uint64_t fee, uint64_t& base_reward, uint64_t already_generated_coins, bool &partial_block_reward, uint8_t version)
 {
   LOG_PRINT_L3("Blockchain::" << __func__);
-
   //validate reward
   uint64_t money_in_use = 0;
   for (auto& o: b.miner_tx.vout)
     money_in_use += o.amount;
- 
   partial_block_reward = false;
-
-  uint64_t block_height = get_block_height(b);
-  LOG_PRINT_L3("XXX Coinbase transaction for block " << block_height << " | " << get_block_hash(b) << " MONEY IN USE(" << print_money(money_in_use) << "). Block reward is " << print_money(base_reward + fee) << "(" << print_money(base_reward) << "+" << print_money(fee) << ")");
-
 
   if (version == 3) {
     for (auto &o: b.miner_tx.vout) {
@@ -1236,7 +1230,6 @@ bool Blockchain::validate_miner_transaction(const block& b, size_t cumulative_bl
     MERROR_VER("block weight " << cumulative_block_weight << " is bigger than allowed for this blockchain");
     return false;
   }
-
   if(base_reward + fee < money_in_use)
   {
     MERROR_VER("The coinbase transaction for block " << block_height << " | " << get_block_hash(b) << " attempted to overspend (" << print_money(money_in_use) << "). Block reward is " << print_money(base_reward + fee) << "(" << print_money(base_reward) << "+" << print_money(fee) << ")");
