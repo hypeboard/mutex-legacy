@@ -3355,8 +3355,8 @@ bool wallet2::get_rct_distribution(uint64_t &start_height, std::vector<uint64_t>
     MWARNING("Failed to request output distribution: results are not for amount 0");
     return false;
   }
-  //for (size_t i = 1; i < res.distributions[0].data.distribution.size(); ++i)
-  //  res.distributions[0].data.distribution[i] += res.distributions[0].data.distribution[i-1];
+  for (size_t i = 1; i < res.distributions[0].data.distribution.size(); ++i)
+    res.distributions[0].data.distribution[i] += res.distributions[0].data.distribution[i-1];
   start_height = res.distributions[0].data.start_height;
   distribution = std::move(res.distributions[0].data.distribution);
   return true;
