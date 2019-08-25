@@ -1236,7 +1236,7 @@ bool Blockchain::validate_miner_transaction(const block& b, size_t cumulative_bl
     MERROR_VER("The coinbase transaction for block " << block_height << " | " << get_block_hash(b) << " attempted to overspend (" << print_money(money_in_use) << "). Block reward is " << print_money(base_reward + fee) << "(" << print_money(base_reward) << "+" << print_money(fee) << ")");
     return false;
   } else {
-    MERROR_VER("Coinbase transaction for block " << block_height << " | " << get_block_hash(b) << " MONEY IN USE(" << print_money(money_in_use) << "). Block reward is " << print_money(base_reward + fee) << "(" << print_money(base_reward) << "+" << print_money(fee) << ")");
+    // MERROR_VER("Coinbase transaction for block " << block_height << " | " << get_block_hash(b) << " MONEY IN USE(" << print_money(money_in_use) << "). Block reward is " << print_money(base_reward + fee) << "(" << print_money(base_reward) << "+" << print_money(fee) << ")");
   }
   // From hard fork 2, we allow a miner to claim less block reward than is allowed, in case a miner wants less dust
   if (version < 2)

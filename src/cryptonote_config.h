@@ -48,7 +48,7 @@
 #define CURRENT_BLOCK_MINOR_VERSION                     0
 #define CRYPTONOTE_BLOCK_FUTURE_TIME_LIMIT_V2           300*2
 #define CRYPTONOTE_BLOCK_FUTURE_TIME_LIMIT              60*60*2
-#define CRYPTONOTE_DEFAULT_TX_SPENDABLE_AGE             10 // testing 4 from wownero.. was 10
+#define CRYPTONOTE_DEFAULT_TX_SPENDABLE_AGE             5 // testing 4 from wownero.. was 10
 
 #define BLOCKCHAIN_TIMESTAMP_CHECK_WINDOW               60
 
