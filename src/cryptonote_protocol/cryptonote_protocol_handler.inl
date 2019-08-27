@@ -2110,7 +2110,7 @@ skip:
         << "        ██║╚██╔╝██║██║   ██║   ██║   ██╔══╝   ██╔██╗   " << ENDL
         << "        ██║ ╚═╝ ██║╚██████╔╝   ██║   ███████╗██╔╝ ██╗  " << ENDL
         << "        ╚═╝     ╚═╝ ╚═════╝    ╚═╝   ╚══════╝╚═╝  ╚═╝  " << ENDL
-        << "              Version 0.2.1: 'Missión: Dystopía         " <<ENDL
+        << "              Version 0.2.1: 'Missión Dystopía'         " <<ENDL
         << ENDL
         << "Join our Discord at https://discord.gg/cK2Bang" << ENDL
         << "Use the \"help\" command to see the list of available commands." << ENDL
