@@ -843,7 +843,6 @@ private:
     void cold_tx_aux_import(const std::vector<pending_tx>& ptx, const std::vector<std::string>& tx_device_aux);
     void cold_sign_tx(const std::vector<pending_tx>& ptx_vector, signed_tx_set &exported_txs, std::vector<cryptonote::address_parse_info> &dsts_info, std::vector<std::string> & tx_device_aux);
     uint64_t cold_key_image_sync(uint64_t &spent, uint64_t &unspent);
-    void device_show_address(uint32_t account_index, uint32_t address_index, const boost::optional<crypto::hash8> &payment_id);
     bool parse_multisig_tx_from_str(std::string multisig_tx_st, multisig_tx_set &exported_txs) const;
     bool load_multisig_tx(cryptonote::blobdata blob, multisig_tx_set &exported_txs, std::function<bool(const multisig_tx_set&)> accept_func = NULL);
     bool load_multisig_tx_from_file(const std::string &filename, multisig_tx_set &exported_txs, std::function<bool(const multisig_tx_set&)> accept_func = NULL);
@@ -1004,6 +1003,8 @@ private:
 
     bool always_confirm_transfers() const { return m_always_confirm_transfers; }
     void always_confirm_transfers(bool always) { m_always_confirm_transfers = always; }
+    bool auto_confirm_churn() const { return m_auto_confirm_churn; }
+    void auto_confirm_churn(bool always) { m_auto_confirm_churn = always; }
     bool print_ring_members() const { return m_print_ring_members; }
     void print_ring_members(bool value) { m_print_ring_members = value; }
     bool store_tx_info() const { return m_store_tx_info; }
@@ -1095,7 +1096,6 @@ private:
     size_t get_num_transfer_details() const { return m_transfers.size(); }
     const transfer_details &get_transfer_details(size_t idx) const;
 
-    uint8_t get_current_hard_fork();
     void get_hard_fork_info(uint8_t version, uint64_t &earliest_height) const;
     bool use_fork_rules(uint8_t version, int64_t early_blocks = 0) const;
     int get_fee_algorithm() const;
@@ -1249,7 +1249,7 @@ private:
      */
     const char* const ATTRIBUTE_DESCRIPTION = "wallet2.description";
     void set_attribute(const std::string &key, const std::string &value);
-    bool get_attribute(const std::string &key, std::string &value) const;
+    std::string get_attribute(const std::string &key) const;
 
     crypto::public_key get_multisig_signer_public_key(const crypto::secret_key &spend_skey) const;
     crypto::public_key get_multisig_signer_public_key() const;
@@ -1470,6 +1470,7 @@ private:
     uint32_t m_multisig_rounds_passed;
     std::vector<crypto::public_key> m_multisig_derivations;
     bool m_always_confirm_transfers;
+    bool m_auto_confirm_churn;
     bool m_print_ring_members;
     bool m_store_tx_info; /*!< request txkey to be returned in RPC, and store in the wallet cache file */
     uint32_t m_default_mixin;
@@ -1506,7 +1507,6 @@ private:
     uint64_t m_device_last_key_image_sync;
     bool m_use_dns;
     bool m_offline;
-    uint32_t m_rpc_version;
 
     // Aux transaction data from device
     std::unordered_map<crypto::hash, std::string> m_tx_device;

@@ -1965,7 +1965,7 @@ namespace tools
         }
         if (addresses.empty())
         {
-          er.message = std::string("No Mutex address found at ") + url;
+          er.message = std::string("No Wownero address found at ") + url;
           return {};
         }
         return addresses[0];
@@ -2099,12 +2099,7 @@ namespace tools
       return false;
     }
 
-    if (!m_wallet->get_attribute(req.key, res.value))
-    {
-      er.code = WALLET_RPC_ERROR_CODE_ATTRIBUTE_NOT_FOUND;
-      er.message = "Attribute not found.";
-      return false;
-    }
+    res.value = m_wallet->get_attribute(req.key);
     return true;
   }
   bool wallet_rpc_server::on_get_tx_key(const wallet_rpc::COMMAND_RPC_GET_TX_KEY::request& req, wallet_rpc::COMMAND_RPC_GET_TX_KEY::response& res, epee::json_rpc::error& er, const connection_context *ctx)
@@ -2757,7 +2752,7 @@ namespace tools
         }
         if (addresses.empty())
         {
-          er.message = std::string("No Mutex address found at ") + url;
+          er.message = std::string("No Wownero address found at ") + url;
           return {};
         }
         return addresses[0];
@@ -4386,7 +4381,7 @@ int main(int argc, char** argv) {
   std::tie(vm, should_terminate) = wallet_args::main(
     argc, argv,
     "mutex-wallet-rpc [--wallet-file=<file>|--generate-from-json=<file>|--wallet-dir=<directory>] [--rpc-bind-port=<port>]",
-    tools::wallet_rpc_server::tr("This is the RPC monero wallet. It needs to connect to a monero\ndaemon to work correctly."),
+    tools::wallet_rpc_server::tr("This is the RPC wownero wallet. It needs to connect to a wownero\ndaemon to work correctly."),
     desc_params,
     po::positional_options_description(),
     [](const std::string &s, bool emphasis){ epee::set_console_color(emphasis ? epee::console_color_white : epee::console_color_default, true); std::cout << s << std::endl; if (emphasis) epee::reset_console_color(); },
