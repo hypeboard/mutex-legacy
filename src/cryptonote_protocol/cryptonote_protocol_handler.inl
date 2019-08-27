@@ -2067,7 +2067,7 @@ skip:
     bool val_expected = false;
     if(m_synchronized.compare_exchange_strong(val_expected, true))
     {
-      MGINFO_RED(ENDL
+      MGINFO_MAGENTA(ENDL
         << "******************************************************************************" << ENDL
         << ENDL 
         << ENDL
@@ -2110,7 +2110,7 @@ skip:
         << "        ██║╚██╔╝██║██║   ██║   ██║   ██╔══╝   ██╔██╗   " << ENDL
         << "        ██║ ╚═╝ ██║╚██████╔╝   ██║   ███████╗██╔╝ ██╗  " << ENDL
         << "        ╚═╝     ╚═╝ ╚═════╝    ╚═╝   ╚══════╝╚═╝  ╚═╝  " << ENDL
-        << "         Version 0.2.1: 'Misión Distopía" <<ENDL
+        << "              Version 0.2.1: 'Missión: Dystopía         " <<ENDL
         << ENDL
         << "Join our Discord at https://discord.gg/cK2Bang" << ENDL
         << "Use the \"help\" command to see the list of available commands." << ENDL
