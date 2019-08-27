@@ -130,7 +130,7 @@ if(NOT IOS)
   add_subdirectory(gen_multisig)
   add_subdirectory(daemonizer)
   add_subdirectory(daemon)
-  add_subdirectory(blockchain_utilities)
+  #add_subdirectory(blockchain_utilities)
 endif()
 
 if(CMAKE_BUILD_TYPE STREQUAL Debug)
