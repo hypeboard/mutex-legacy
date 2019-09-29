@@ -43,7 +43,7 @@ case "$os" in
     --add-peer=34.232.227.76:26942 \
     --add-peer=3.210.60.30:26942 \
     --disable-dns-checkpoints \
-    --block-sync-size=50s
+    --block-sync-size=50
     ;;
   *)
 
