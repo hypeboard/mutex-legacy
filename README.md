@@ -1,5 +1,6 @@
-# Monero
+# Mutex
 
+Copyright (c) 2018-2020 The Mutex Project. 
 Copyright (c) 2014-2019 The Monero Project.   
 Portions Copyright (c) 2012-2013 The Cryptonote developers.
 
@@ -20,16 +21,17 @@ Portions Copyright (c) 2012-2013 The Cryptonote developers.
   - [Contributing](#contributing)
   - [Scheduled software upgrades](#scheduled-software-upgrades)
   - [Release staging schedule and protocol](#release-staging-schedule-and-protocol)
-  - [Compiling Monero from source](#compiling-monero-from-source)
+  - [Compiling Mutex from source](#compiling-from-source)
     - [Dependencies](#dependencies)
 
 ## Development resources
 
-- Web: [getmonero.org](https://getmonero.org)
-- Forum: [forum.getmonero.org](https://forum.getmonero.org)
-- Mail: [dev@getmonero.org](mailto:dev@getmonero.org)
-- GitHub: [https://github.com/monero-project/monero](https://github.com/monero-project/monero)
-- IRC: [#monero-dev on Freenode](https://webchat.freenode.net/?randomnick=1&channels=%23monero-dev&prompt=1&uio=d4)
+- Web: [getmonero.org](https://mutexcurrency.io)
+- Email: [dev@getmonero.org](mailto:dev@getmonero.org)
+- GitHub: [https://github.com/MutexProject/monero](https://github.com/MutexProject/mutex)
+- Discord: 
+- Telegram:
+- Twitter:
 
 ## Vulnerability response
 
