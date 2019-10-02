@@ -4,11 +4,11 @@ os=${OSTYPE//[0-9.-]*/}
 
 case "$os" in
   darwin)
-    echo "I'm a Mac"
+    echo "Running for Mac"
     ./build/Darwin/release/release/bin/mutexd \
-    --limit-rate=100000000 \
-    --out-peers=30 \
-    --in-peers=30 \
+    --limit-rate=10000000 \
+    --out-peers=15 \
+    --in-peers=15 \
     --rpc-bind-ip=0.0.0.0 \
     --confirm-external-bind \
     --rpc-bind-port=26943 \
@@ -20,18 +20,18 @@ case "$os" in
     --add-peer=34.232.227.76:26942 \
     --add-peer=3.210.60.30:26942 \
     --disable-dns-checkpoints \
-    --block-sync-size=2000
+    --block-sync-size=100
     ;;
   msys)
     echo "I'm Windows using git bash"
     ;;
 
   linux)
-    echo "I'm Linux"
+    echo "Running for Linux"
     ./build/Linux/release/release/bin/mutexd \
-    --limit-rate=100000000 \
-    --out-peers=30 \
-    --in-peers=30 \
+    --limit-rate=10000000\
+    --out-peers=15 \
+    --in-peers=15 \
     --rpc-bind-ip=0.0.0.0 \
     --confirm-external-bind \
     --rpc-bind-port=26943 \
@@ -43,7 +43,7 @@ case "$os" in
     --add-peer=34.232.227.76:26942 \
     --add-peer=3.210.60.30:26942 \
     --disable-dns-checkpoints \
-    --block-sync-size=50
+    --block-sync-size=500
     ;;
   *)
 
