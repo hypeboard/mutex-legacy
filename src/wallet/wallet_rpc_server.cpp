@@ -1745,6 +1745,11 @@ namespace tools
       else if (payment_id_str.size() == 2 * sizeof(payment_id8))
       {
         r = epee::string_tools::hex_to_pod(payment_id_str, payment_id8);
+        if (r)
+        {
+          memcpy(payment_id.data, payment_id8.data, 8);
+          memset(payment_id.data + 8, 0, 24);
+        }
       }
       else
       {
@@ -1965,7 +1970,7 @@ namespace tools
         }
         if (addresses.empty())
         {
-          er.message = std::string("No Wownero address found at ") + url;
+          er.message = std::string("No Monero address found at ") + url;
           return {};
         }
         return addresses[0];
@@ -2752,7 +2757,7 @@ namespace tools
         }
         if (addresses.empty())
         {
-          er.message = std::string("No Wownero address found at ") + url;
+          er.message = std::string("No Mutex address found at ") + url;
           return {};
         }
         return addresses[0];

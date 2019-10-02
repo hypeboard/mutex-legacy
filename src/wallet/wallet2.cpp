@@ -1088,7 +1088,6 @@ wallet2::wallet2(network_type nettype, uint64_t kdf_rounds, bool unattended):
   m_nettype(nettype),
   m_multisig_rounds_passed(0),
   m_always_confirm_transfers(true),
-  m_auto_confirm_churn(false),
   m_print_ring_members(false),
   m_store_tx_info(true),
   m_default_mixin(0),
@@ -1098,9 +1097,9 @@ wallet2::wallet2(network_type nettype, uint64_t kdf_rounds, bool unattended):
   m_first_refresh_done(false),
   m_refresh_from_block_height(0),
   m_explicit_refresh_from_block_height(true),
-  m_confirm_missing_payment_id(false),
+  m_confirm_missing_payment_id(true),
   m_confirm_non_default_ring_size(true),
-  m_ask_password(AskPasswordOnAction),
+  m_ask_password(AskPasswordToDecrypt),
   m_min_output_count(0),
   m_min_output_value(0),
   m_merge_destinations(false),
@@ -1108,12 +1107,12 @@ wallet2::wallet2(network_type nettype, uint64_t kdf_rounds, bool unattended):
   m_confirm_backlog_threshold(0),
   m_confirm_export_overwrite(true),
   m_auto_low_priority(true),
-  m_segregate_pre_fork_outputs(false),
-  m_key_reuse_mitigation2(false),
+  m_segregate_pre_fork_outputs(true),
+  m_key_reuse_mitigation2(true),
   m_segregation_height(0),
   m_ignore_fractional_outputs(true),
   m_track_uses(false),
-  m_setup_background_mining(BackgroundMiningNo),
+  m_setup_background_mining(BackgroundMiningMaybe),
   m_is_initialized(false),
   m_kdf_rounds(kdf_rounds),
   is_old_file_format(false),
@@ -3355,8 +3354,8 @@ bool wallet2::get_rct_distribution(uint64_t &start_height, std::vector<uint64_t>
     MWARNING("Failed to request output distribution: results are not for amount 0");
     return false;
   }
-  // for (size_t i = 1; i < res.distributions[0].data.distribution.size(); ++i)
-  //   res.distributions[0].data.distribution[i] += res.distributions[0].data.distribution[i-1];
+  for (size_t i = 1; i < res.distributions[0].data.distribution.size(); ++i)
+    res.distributions[0].data.distribution[i] += res.distributions[0].data.distribution[i-1];
   start_height = res.distributions[0].data.start_height;
   distribution = std::move(res.distributions[0].data.distribution);
   return true;
@@ -3789,7 +3788,7 @@ bool wallet2::load_keys(const std::string& keys_file_name, const epee::wipeable_
     m_segregation_height = 0;
     m_ignore_fractional_outputs = true;
     m_track_uses = false;
-    m_setup_background_mining = BackgroundMiningNo;
+    m_setup_background_mining = BackgroundMiningMaybe;
     m_subaddress_lookahead_major = SUBADDRESS_LOOKAHEAD_MAJOR;
     m_subaddress_lookahead_minor = SUBADDRESS_LOOKAHEAD_MINOR;
     m_original_keys_available = false;
@@ -6091,7 +6090,7 @@ void wallet2::commit_tx(pending_tx& ptx)
     COMMAND_RPC_SEND_RAW_TX::request req;
     req.tx_as_hex = epee::string_tools::buff_to_hex_nodelimer(tx_to_blob(ptx.tx));
     req.do_not_relay = false;
-    req.do_sanity_checks = false;
+    req.do_sanity_checks = true;
     COMMAND_RPC_SEND_RAW_TX::response daemon_send_resp;
     m_daemon_rpc_mutex.lock();
     bool r = invoke_http_json("/sendrawtransaction", req, daemon_send_resp, rpc_timeout);
@@ -7520,22 +7519,21 @@ void wallet2::get_outs(std::vector<std::vector<tools::wallet2::get_outs_entry>> 
     uint64_t rct_start_height;
     std::vector<uint64_t> rct_offsets;
     bool has_rct = false;
-    //uint64_t max_rct_index = 0;
+    uint64_t max_rct_index = 0;
     for (size_t idx: selected_transfers)
       if (m_transfers[idx].is_rct())
-        { has_rct = true; break; }
-      /*{
+      {
         has_rct = true;
         max_rct_index = std::max(max_rct_index, m_transfers[idx].m_global_output_index);
-      }*/
+      }
     const bool has_rct_distribution = has_rct && get_rct_distribution(rct_start_height, rct_offsets);
     if (has_rct_distribution)
     {
       // check we're clear enough of rct start, to avoid corner cases below
       THROW_WALLET_EXCEPTION_IF(rct_offsets.size() <= CRYPTONOTE_DEFAULT_TX_SPENDABLE_AGE,
           error::get_output_distribution, "Not enough rct outputs");
-      /*THROW_WALLET_EXCEPTION_IF(rct_offsets.back() <= max_rct_index,
-          error::get_output_distribution, "Daemon reports suspicious number of rct outputs");*/
+      THROW_WALLET_EXCEPTION_IF(rct_offsets.back() <= max_rct_index,
+          error::get_output_distribution, "Daemon reports suspicious number of rct outputs");
     }
 
     // get histogram for the amounts we need
@@ -9213,7 +9211,7 @@ std::vector<wallet2::pending_tx> wallet2::create_transactions_2(std::vector<cryp
   // early out if we know we can't make it anyway
   // we could also check for being within FEE_PER_KB, but if the fee calculation
   // ever changes, this might be missed, so let this go through
-  const uint64_t min_fee = estimate_fee(use_per_byte_fee, use_rct, 1, fake_outs_count, 2, extra.size(), bulletproof, base_fee, fee_multiplier, fee_quantization_mask);
+  const uint64_t min_fee = (fee_multiplier * base_fee * estimate_tx_size(use_rct, 1, fake_outs_count, 2, extra.size(), bulletproof));
   uint64_t balance_subtotal = 0;
   uint64_t unlocked_balance_subtotal = 0;
   for (uint32_t index_minor : subaddr_indices)
@@ -9826,7 +9824,7 @@ std::vector<wallet2::pending_tx> wallet2::create_transactions_from(const crypton
   const bool bulletproof = use_fork_rules(get_bulletproof_fork(), 0);
   const rct::RCTConfig rct_config {
     bulletproof ? rct::RangeProofPaddedBulletproof : rct::RangeProofBorromean,
-    bulletproof ? (use_fork_rules(HF_VERSION_SMALLER_BP, -10) ? 2 : 1) : 0
+    bulletproof ? (use_fork_rules(HF_VERSION_SMALLER_BP, -10) ? 2 : 1) : 0,
   };
   const uint64_t base_fee  = get_base_fee();
   const uint64_t fee_multiplier = get_fee_multiplier(priority, get_fee_algorithm());
