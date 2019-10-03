@@ -84,46 +84,6 @@ DISABLE_VS_WARNINGS(4267)
 // used to overestimate the block reward when estimating a per kB to use
 #define BLOCK_REWARD_OVERESTIMATE (10 * 1000000000000)
 
-static const struct {
-  uint8_t version;
-  uint64_t height;
-  uint8_t threshold;
-  time_t time;
-} mainnet_hard_forks[] = {
-  // version 1 from the start of the blockchain
-  { 1, 1, 0, 1341378000 },
-  { 7, 2, 0, 1521303150 },
-  { 8, 100000, 0, 1529884800 },
-  //{ 11, 690200, 0, 1567296000 }, // 09/01/2019 @ 12:00am (UTC)
-  { 12, 800000, 0, 1567296000 },
-};
-static const uint64_t mainnet_hard_fork_version_1_till = 2;
-
-static const struct {
-  uint8_t version;
-  uint64_t height;
-  uint8_t threshold;
-  time_t time;
-} testnet_hard_forks[] = {
-  // version 1 from the start of the blockchain
-  { 1, 1, 0, 1341378000 },
-  { 7, 2, 0, 1519605000 },
-  { 8, 100, 0, 1523255371 },
-  //{ 12, 500, 0, 1533255371 },
-  // { 12, 1212880, 0, 1558044000 },
-};
-static const uint64_t testnet_hard_fork_version_1_till = 2;
-
-static const struct {
-  uint8_t version;
-  uint64_t height;
-  uint8_t threshold;
-  time_t time;
-} stagenet_hard_forks[] = {
-  // version 1 from the start of the blockchain
-  { 1, 1, 0, 1341378000 },
-};
-
 //------------------------------------------------------------------
 Blockchain::Blockchain(tx_memory_pool& tx_pool) :
   m_db(), m_tx_pool(tx_pool), m_hardfork(NULL), m_timestamps_and_difficulties_height(0), m_current_block_cumul_weight_limit(0), m_current_block_cumul_weight_median(0),
@@ -1238,6 +1198,7 @@ bool Blockchain::validate_miner_transaction(const block& b, size_t cumulative_bl
   }
 
   std::vector<uint64_t> last_blocks_weights;
+  uint64_t block_height = get_block_height(b);
   get_last_n_blocks_weights(last_blocks_weights, CRYPTONOTE_REWARD_BLOCKS_WINDOW);
   if (!get_block_reward(epee::misc_utils::median(last_blocks_weights), cumulative_block_weight, already_generated_coins, base_reward, version))
   {

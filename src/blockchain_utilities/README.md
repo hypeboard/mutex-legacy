@@ -1,5 +1,6 @@
-# Monero Blockchain Utilities
+# Mutex Blockchain Utilities
 
+Copyright (c) 2017-2019, The Nytex Project
 Copyright (c) 2014-2019, The Monero Project
 
 ## Introduction

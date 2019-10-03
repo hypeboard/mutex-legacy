@@ -102,6 +102,17 @@
 #define CRYPTONOTE_LOCKED_TX_ALLOWED_DELTA_BLOCKS       1
 
 
+// see src/cryptonote_protocol/levin_notify.cpp
+#define CRYPTONOTE_NOISE_MIN_EPOCH                      5      // minutes
+#define CRYPTONOTE_NOISE_EPOCH_RANGE                    30     // seconds
+#define CRYPTONOTE_NOISE_MIN_DELAY                      10     // seconds
+#define CRYPTONOTE_NOISE_DELAY_RANGE                    5      // seconds
+#define CRYPTONOTE_NOISE_BYTES                          3*1024 // 3 KiB
+#define CRYPTONOTE_NOISE_CHANNELS                       2      // Max outgoing connections per zone used for noise/covert sending
+
+#define CRYPTONOTE_MAX_FRAGMENTS                        20 // ~20 * NOISE_BYTES max payload size for covert/noise send
+
+
 #define DIFFICULTY_BLOCKS_ESTIMATE_TIMESPAN             DIFFICULTY_TARGET_V1 //just alias; used by tests
 
 #define BLOCKS_IDS_SYNCHRONIZING_DEFAULT_COUNT          10000  //by default, blocks ids count in synchronizing
@@ -139,6 +150,8 @@
 
 #define P2P_SUPPORT_FLAG_FLUFFY_BLOCKS                  0x01
 #define P2P_SUPPORT_FLAGS                               P2P_SUPPORT_FLAG_FLUFFY_BLOCKS
+
+#define RPC_IP_FAILS_BEFORE_BLOCK                       3
 
 #define ALLOW_DEBUG_COMMANDS
 
