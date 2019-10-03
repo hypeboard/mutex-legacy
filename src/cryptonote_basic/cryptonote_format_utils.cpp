@@ -38,7 +38,6 @@
 #include "crypto/crypto.h"
 #include "crypto/hash.h"
 #include "ringct/rctSigs.h"
-#include <string>
 
 using namespace epee;
 

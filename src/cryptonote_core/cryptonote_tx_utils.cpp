@@ -355,7 +355,7 @@ namespace cryptonote
 
     if (shuffle_outs)
     {
-      std::shuffle(destinations.begin(), destinations.end(), std::default_random_engine(crypto::rand<unsigned int>()));
+      std::shuffle(destinations.begin(), destinations.end(), crypto::random_device{});
     }
 
     // sort ins by their key image
@@ -592,9 +592,7 @@ namespace cryptonote
       crypto::hash tx_prefix_hash;
       get_transaction_prefix_hash(tx, tx_prefix_hash);
       rct::ctkeyV outSk;
-      if (rct_config.range_proof_type != rct::RangeProofPaddedBulletproof && use_simple_rct)
-        tx.rct_signatures = rct::genRctSimple_old(rct::hash2rct(tx_prefix_hash), inSk, destinations, inamounts, outamounts, amount_in - amount_out, mixRing, amount_keys, msout ? &kLRki : NULL, msout, index, outSk, rct_config, hwdev);
-       else if (use_simple_rct && rct_config.range_proof_type == rct::RangeProofPaddedBulletproof)
+      if (use_simple_rct)
         tx.rct_signatures = rct::genRctSimple(rct::hash2rct(tx_prefix_hash), inSk, destinations, inamounts, outamounts, amount_in - amount_out, mixRing, amount_keys, msout ? &kLRki : NULL, msout, index, outSk, rct_config, hwdev);
       else
         tx.rct_signatures = rct::genRct(rct::hash2rct(tx_prefix_hash), inSk, destinations, outamounts, mixRing, amount_keys, msout ? &kLRki[0] : NULL, msout, sources[0].real_output, outSk, rct_config, hwdev); // same index assumption
@@ -650,7 +648,7 @@ namespace cryptonote
     )
   {
     //genesis block
-    bl = boost::value_initialized<block>();
+    bl = {};
 
     blobdata tx_bl;
     bool r = string_tools::parse_hexstr_to_binbuff(genesis_tx, tx_bl);
@@ -669,35 +667,30 @@ namespace cryptonote
   void get_altblock_longhash(const block& b, crypto::hash& res, const uint64_t main_height, const uint64_t height, const uint64_t seed_height, const crypto::hash& seed_hash)
   {
     blobdata bd = get_block_hashing_blob(b);
-    rx_alt_slowhash(main_height, seed_height, seed_hash.data, bd.data(), bd.size(), res.data);
+    rx_slow_hash(main_height, seed_height, seed_hash.data, bd.data(), bd.size(), res.data, 0, 1);
   }
 
   bool get_block_longhash(const Blockchain *pbc, const block& b, crypto::hash& res, const uint64_t height, const int miners)
   {
     blobdata bd = get_block_hashing_blob(b);
-    auto get_variant=[](int hf_version){
-      if (hf_version < 7) {
-        return 0;
-      } else if ((hf_version == 7) || (hf_version == 8)){
-        return 1;
-      } else {
-        return 6;
+    if (b.major_version >= RX_BLOCK_VERSION)
+    {
+      uint64_t seed_height, main_height;
+      crypto::hash hash;
+      if (pbc != NULL)
+      {
+        seed_height = rx_seedheight(height);
+        hash = pbc->get_pending_block_id_by_height(seed_height);
+        main_height = pbc->get_current_blockchain_height();
+      } else
+      {
+        memset(&hash, 0, sizeof(hash));  // only happens when generating genesis block
+        seed_height = 0;
+        main_height = 0;
       }
-    };
-    const int pow_variant = get_variant(b.major_version);
-
-    if (pow_variant >= 6) {
-      uint64_t seed_height;
-      if (rx_needhash(height, &seed_height)) {
-        crypto::hash hash;
-        if (pbc != NULL)
-          hash = pbc->get_pending_block_id_by_height(seed_height);
-        else
-          memset(&hash, 0, sizeof(hash));  // only happens when generating genesis block
-        rx_seedhash(seed_height, hash.data, miners);
-      }
-      rx_slow_hash(bd.data(), bd.size(), res.data, miners);
+      rx_slow_hash(main_height, seed_height, hash.data, bd.data(), bd.size(), res.data, miners, 0);
     } else {
+      const int pow_variant = b.major_version >= 7 ? b.major_version - 6 : 0;
       crypto::cn_slow_hash(bd.data(), bd.size(), res, pow_variant, height);
     }
     return true;
