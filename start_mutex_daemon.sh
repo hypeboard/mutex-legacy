@@ -19,6 +19,11 @@ case "$os" in
     --add-peer=3.90.100.66:26942 \
     --add-peer=34.232.227.76:26942 \
     --add-peer=3.210.60.30:26942 \
+    --add-peer=34.232.227.76:26942 \
+    --add-peer=144.76.83.138:26942 \
+    --add-peer=167.99.229.57:26942 \
+    --add-peer=193.37.138.146:26942 \
+    --add-peer=5.39.85.227:26942 \
     --disable-dns-checkpoints \
     --block-sync-size=100
     ;;
@@ -42,6 +47,11 @@ case "$os" in
     --add-peer=3.90.100.66:26942 \
     --add-peer=34.232.227.76:26942 \
     --add-peer=3.210.60.30:26942 \
+    --add-peer=167.99.229.57:26942 \
+    --add-peer=34.232.227.76:26942 \
+    --add-peer=144.76.83.138:26942 \
+    --add-peer=193.37.138.146:26942 \
+    --add-peer=5.39.85.227:26942 \
     --disable-dns-checkpoints \
     --block-sync-size=500
     ;;
