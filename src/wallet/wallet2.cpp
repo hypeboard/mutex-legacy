@@ -3323,7 +3323,7 @@ bool wallet2::get_rct_distribution(uint64_t &start_height, std::vector<uint64_t>
   cryptonote::COMMAND_RPC_GET_OUTPUT_DISTRIBUTION::response res = AUTO_VAL_INIT(res);
   req.amounts.push_back(0);
   req.from_height = 0;
-  req.cumulative = true;
+  req.cumulative = false;
   req.binary = true;
   req.compress = true;
   m_daemon_rpc_mutex.lock();
