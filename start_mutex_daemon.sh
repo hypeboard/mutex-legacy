@@ -27,7 +27,7 @@ case "$os" in
 
   linux)
     echo "Running for Linux"
-    ./build/Linux/release/release/bin/mutexd \
+    ./build/Linux/master/release/bin/mutexd \
     --limit-rate=10000000\
     --out-peers=15 \
     --in-peers=15 \
