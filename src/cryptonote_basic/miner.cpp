@@ -30,7 +30,6 @@
 
 #include <sstream>
 #include <numeric>
-#include <boost/utility/value_init.hpp>
 #include <boost/interprocess/detail/atomic.hpp>
 #include <boost/algorithm/string.hpp>
 #include "misc_language.h"
@@ -63,7 +62,9 @@
   #include <devstat.h>
   #include <errno.h>
   #include <fcntl.h>
+#if defined(__amd64__) || defined(__i386__) || defined(__x86_64__)
   #include <machine/apm_bios.h>
+#endif
   #include <stdio.h>
   #include <sys/resource.h>
   #include <sys/sysctl.h>
@@ -93,7 +94,7 @@ namespace cryptonote
     const command_line::arg_descriptor<std::string> arg_extra_messages =  {"extra-messages-file", "Specify file for extra messages to include into coinbase transactions", "", true};
     const command_line::arg_descriptor<std::string> arg_start_mining =    {"start-mining", "Specify wallet address to mining for", "", true};
     const command_line::arg_descriptor<uint32_t>      arg_mining_threads =  {"mining-threads", "Specify mining threads count", 0, true};
-    const command_line::arg_descriptor<bool>        arg_bg_mining_enable =  {"bg-mining-enable", "enable/disable background mining", true, true};
+    const command_line::arg_descriptor<bool>        arg_bg_mining_enable =  {"bg-mining-enable", "enable background mining", true, true};
     const command_line::arg_descriptor<bool>        arg_bg_mining_ignore_battery =  {"bg-mining-ignore-battery", "if true, assumes plugged in when unable to query system power status", false, true};    
     const command_line::arg_descriptor<uint64_t>    arg_bg_mining_min_idle_interval_seconds =  {"bg-mining-min-idle-interval", "Specify min lookback interval in seconds for determining idle state", miner::BACKGROUND_MINING_DEFAULT_MIN_IDLE_INTERVAL_IN_SECONDS, true};
     const command_line::arg_descriptor<uint16_t>     arg_bg_mining_idle_threshold_percentage =  {"bg-mining-idle-threshold", "Specify minimum avg idle percentage over lookback interval", miner::BACKGROUND_MINING_DEFAULT_IDLE_THRESHOLD_PERCENTAGE, true};
@@ -102,7 +103,7 @@ namespace cryptonote
 
 
   miner::miner(i_miner_handler* phandler, Blockchain* pbc):m_stop(1),
-    m_template(boost::value_initialized<block>()),
+    m_template{},
     m_template_no(0),
     m_diffic(0),
     m_thread_index(0),
@@ -1087,6 +1088,7 @@ namespace cryptonote
           return boost::logic::tribool(boost::logic::indeterminate);
         }
 
+#if defined(__amd64__) || defined(__i386__) || defined(__x86_64__)
         apm_info info;
         if( ioctl(fd, APMIO_GETINFO, &info) == -1 ) {
           close(fd);
@@ -1127,6 +1129,7 @@ namespace cryptonote
         LOG_ERROR("sysctlbyname(\"hw.acpi.acline\") output is unexpectedly "
           << n << " bytes instead of the expected " << sizeof(ac) << " bytes.");
         return boost::logic::tribool(boost::logic::indeterminate);
+#endif
       }
       return boost::logic::tribool(ac == 0);
     #endif

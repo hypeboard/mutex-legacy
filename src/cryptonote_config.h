@@ -38,9 +38,8 @@
 
 #define CRYPTONOTE_MAX_BLOCK_NUMBER                     500000000
 #define CRYPTONOTE_GETBLOCKTEMPLATE_MAX_BLOCK_SIZE	196608 //size of block (bytes) that is the maximum that miners will produce
-#define CRYPTONOTE_MAX_TX_SIZE                          1000000000
+#define CRYPTONOTE_MAX_TX_SIZE                          10000000
 #define CRYPTONOTE_MAX_TX_PER_BLOCK                     0x10000000
-
 #define CRYPTONOTE_PUBLIC_ADDRESS_TEXTBLOB_VER          0
 #define CRYPTONOTE_MINED_MONEY_UNLOCK_WINDOW            60
 #define CURRENT_TRANSACTION_VERSION                     2
@@ -104,6 +103,7 @@
 
 #define DIFFICULTY_BLOCKS_ESTIMATE_TIMESPAN             DIFFICULTY_TARGET_V1 //just alias; used by tests
 
+
 #define BLOCKS_IDS_SYNCHRONIZING_DEFAULT_COUNT          10000  //by default, blocks ids count in synchronizing
 #define BLOCKS_SYNCHRONIZING_DEFAULT_COUNT_PRE_V4       100    //by default, blocks count in blocks downloading
 #define BLOCKS_SYNCHRONIZING_DEFAULT_COUNT              20     //by default, blocks count in blocks downloading
@@ -111,6 +111,16 @@
 
 #define CRYPTONOTE_MEMPOOL_TX_LIVETIME                    (86400*3) //seconds, three days
 #define CRYPTONOTE_MEMPOOL_TX_FROM_ALT_BLOCK_LIVETIME     604800 //seconds, one week
+
+// see src/cryptonote_protocol/levin_notify.cpp
+#define CRYPTONOTE_NOISE_MIN_EPOCH                      5      // minutes
+#define CRYPTONOTE_NOISE_EPOCH_RANGE                    30     // seconds
+#define CRYPTONOTE_NOISE_MIN_DELAY                      10     // seconds
+#define CRYPTONOTE_NOISE_DELAY_RANGE                    5      // seconds
+#define CRYPTONOTE_NOISE_BYTES                          3*1024 // 3 KiB
+#define CRYPTONOTE_NOISE_CHANNELS                       2      // Max outgoing connections per zone used for noise/covert sending
+
+#define CRYPTONOTE_MAX_FRAGMENTS                        20 // ~20 * NOISE_BYTES max payload size for covert/noise send
 
 #define COMMAND_RPC_GET_BLOCKS_FAST_MAX_COUNT           1000
 
@@ -140,6 +150,8 @@
 #define P2P_SUPPORT_FLAG_FLUFFY_BLOCKS                  0x01
 #define P2P_SUPPORT_FLAGS                               P2P_SUPPORT_FLAG_FLUFFY_BLOCKS
 
+#define RPC_IP_FAILS_BEFORE_BLOCK                       3
+
 #define ALLOW_DEBUG_COMMANDS
 
 #define CRYPTONOTE_NAME                         "mutex"
@@ -159,10 +171,15 @@
 #define HF_VERSION_PER_BYTE_FEE                 9
 #define HF_VERSION_SMALLER_BP                   6 //10 allow small bulletproofs earlier
 #define HF_VERSION_LONG_TERM_BLOCK_WEIGHT       10
+#define HF_VERSION_MIN_2_OUTPUTS                12
+#define HF_VERSION_MIN_V2_COINBASE_TX           12
+#define HF_VERSION_SAME_MIXIN                   12
+#define HF_VERSION_REJECT_SIGS_IN_COINBASE      12
+#define HF_VERSION_ENFORCE_MIN_AGE              12
 
 #define PER_KB_FEE_QUANTIZATION_DECIMALS        8
 
-#define HASH_OF_HASHES_STEP                     256
+#define HASH_OF_HASHES_STEP                     512
 
 #define DEFAULT_TXPOOL_MAX_WEIGHT               648000000ull // 3 days at 300000, in bytes
 
@@ -194,6 +211,7 @@ namespace config
 	std::string const GENESIS_TX = "013c01ff000101029b2e4c0281c0b02e7c53291a94d1d0cbff8883f8024f5142ee494ffbbd08807121017767aafcde9be00dcfd098715ebcf7f410daebc582fda69d24a28e9d0bc890d1";
 
   uint32_t const GENESIS_NONCE = 10000;
+
   namespace testnet
   {
     uint64_t const CRYPTONOTE_PUBLIC_ADDRESS_BASE58_PREFIX = 53;

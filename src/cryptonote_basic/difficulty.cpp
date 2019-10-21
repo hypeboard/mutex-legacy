@@ -33,12 +33,12 @@
 #include <cstddef>
 #include <cstdint>
 #include <vector>
-#include <boost/math/special_functions/round.hpp>
 
 #include "int-util.h"
 #include "crypto/hash.h"
 #include "cryptonote_config.h"
 #include "difficulty.h"
+#include <boost/math/special_functions/round.hpp>
 
 #undef MONERO_DEFAULT_LOG_CATEGORY
 #define MONERO_DEFAULT_LOG_CATEGORY "difficulty"

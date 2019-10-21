@@ -183,15 +183,6 @@ else()
   message(STATUS "Building without build tag")
 endif()
 
-# Update and init submodules by default
-if(NOT MANUAL_SUBMODULES)
-  find_package(Git)
-  if(GIT_FOUND)
-    message(STATUS "Initializing submodules")
-    execute_process(COMMAND git "submodule" "update" "--init" "--recursive" WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
-  endif()
-endif()
-
 if(NOT MANUAL_SUBMODULES)
   find_package(Git)
   if(GIT_FOUND)

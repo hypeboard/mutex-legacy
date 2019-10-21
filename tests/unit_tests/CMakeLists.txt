@@ -30,7 +30,6 @@ set(unit_tests_sources
   account.cpp
   apply_permutation.cpp
   address_from_url.cpp
-  ban.cpp
   base58.cpp
   blockchain_db.cpp
   block_queue.cpp
@@ -56,6 +55,7 @@ set(unit_tests_sources
   hmac_keccak.cpp
   http.cpp
   keccak.cpp
+  levin.cpp
   logging.cpp
   long_term_block_weight.cpp
   lmdb.cpp
@@ -67,6 +67,7 @@ set(unit_tests_sources
   multiexp.cpp
   multisig.cpp
   net.cpp
+  node_server.cpp
   notify.cpp
   output_distribution.cpp
   parse_amount.cpp
@@ -116,7 +117,8 @@ target_link_libraries(unit_tests
     ${Boost_THREAD_LIBRARY}
     ${GTEST_LIBRARIES}
     ${CMAKE_THREAD_LIBS_INIT}
-    ${EXTRA_LIBRARIES})
+    ${EXTRA_LIBRARIES}
+    ${ZMQ_LIB})
 set_property(TARGET unit_tests
   PROPERTY
     FOLDER "tests")

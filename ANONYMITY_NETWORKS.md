@@ -160,25 +160,6 @@ the system clock is noticeably off (and therefore more fingerprintable),
 linking the public IPv4/IPv6 connections with the anonymity networks will be
 more difficult.
 
-### Bandwidth Usage
-
-An ISP can passively monitor `monerod` connections from a node and observe when
-a transaction is sent over a Tor/I2P connection via timing analysis + size of
-data sent during that timeframe. I2P should provide better protection against
-this attack - its connections are not circuit based. However, if a node is
-only using I2P for broadcasting Monero transactions, the total aggregate of
-I2P data would also leak information.
-
-#### Mitigation
-
-There is no current mitigation for the user right now. This attack is fairly
-sophisticated, and likely requires support from the internet host of a Monero
-user.
-
-In the near future, "whitening" the amount of data sent over anonymity network
-connections will be performed. An attempt will be made to make a transaction
-broadcast indistinguishable from a peer timed sync command.
-
 ### Intermittent Monero Syncing
 
 If a user only runs `monerod` to send a transaction then quit, this can also

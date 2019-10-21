@@ -102,7 +102,6 @@ namespace cryptonote
 /** a pair of <transaction hash, output index>, typedef for convenience */
 typedef std::pair<crypto::hash, uint64_t> tx_out_index;
 
-extern const command_line::arg_descriptor<std::string> arg_db_type;
 extern const command_line::arg_descriptor<std::string> arg_db_sync_mode;
 extern const command_line::arg_descriptor<bool, false> arg_db_salvage;
 
@@ -156,7 +155,8 @@ struct txpool_tx_meta_t
   uint8_t relayed;
   uint8_t do_not_relay;
   uint8_t double_spend_seen: 1;
-  uint8_t bf_padding: 7;
+  uint8_t pruned: 1;
+  uint8_t bf_padding: 6;
 
   uint8_t padding[76]; // till 192 bytes
 };
@@ -1826,7 +1826,7 @@ private:
 class db_rtxn_guard: public db_txn_guard { public: db_rtxn_guard(BlockchainDB *db): db_txn_guard(db, true) {} };
 class db_wtxn_guard: public db_txn_guard { public: db_wtxn_guard(BlockchainDB *db): db_txn_guard(db, false) {} };
 
-BlockchainDB *new_db(const std::string& db_type);
+BlockchainDB *new_db();
 
 }  // namespace cryptonote
 

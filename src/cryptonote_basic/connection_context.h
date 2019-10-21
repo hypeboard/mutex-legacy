@@ -31,8 +31,10 @@
 #pragma once
 #include <unordered_set>
 #include <atomic>
+#include <boost/date_time/posix_time/posix_time.hpp>
 #include "net/net_utils_base.h"
 #include "copyable_atomic.h"
+#include "crypto/hash.h"
 
 namespace cryptonote
 {
@@ -53,7 +55,7 @@ namespace cryptonote
     };
 
     state m_state;
-    std::vector<crypto::hash> m_needed_objects;
+    std::vector<std::pair<crypto::hash, uint64_t>> m_needed_objects;
     std::unordered_set<crypto::hash> m_requested_objects;
     uint64_t m_remote_blockchain_height;
     uint64_t m_last_response_height;
