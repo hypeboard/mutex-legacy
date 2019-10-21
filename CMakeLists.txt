@@ -301,7 +301,7 @@ endif()
 include_directories(external/rapidjson/include external/easylogging++ src contrib/epee/include external)
 
 if(APPLE)
-  include_directories(SYSTEM /usr/include/malloc)
+  include_directories(SYSTEM /usr/include/malloc /usr/local/include)
   if(POLICY CMP0042)
     cmake_policy(SET CMP0042 NEW)
   endif()
@@ -417,7 +417,7 @@ if (CMAKE_SYSTEM_NAME MATCHES "(SunOS|Solaris)")
 endif ()
 
 if (APPLE AND NOT IOS)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=x86-64 -fvisibility=default -std=c++11")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=x86-64 -fvisibility=default -std=c++11 -DENABLE_DRAFTS=OFF")
   if (NOT OpenSSL_DIR)
       EXECUTE_PROCESS(COMMAND brew --prefix openssl
         OUTPUT_VARIABLE OPENSSL_ROOT_DIR
@@ -805,7 +805,7 @@ else()
     # Since gcc 4.9 the LTO format is non-standard (slim), so we need the gcc-specific ar and ranlib binaries
     if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" AND NOT (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 4.9.0) AND NOT OPENBSD AND NOT DRAGONFLY)
       # When invoking cmake on distributions on which gcc's binaries are prefixed
-      # with an arch-specific triplet, the user must specify -DCHOST=<prefix>
+      # with an arch-specific triplet, the user must specify -DCHOST=<prefix> -DENABLE_DRAFTS=OFF
       if (DEFINED CHOST)
         set(CMAKE_AR "${CHOST}-gcc-ar")
         set(CMAKE_RANLIB "${CHOST}-gcc-ranlib")
