@@ -73,7 +73,7 @@ target_link_libraries(wallet
     ${Boost_REGEX_LIBRARY}
   PRIVATE
     ${EXTRA_LIBRARIES})
-
+    ${ZMQ_LIB}
 set(wallet_rpc_sources
   wallet_rpc_server.cpp)
 
