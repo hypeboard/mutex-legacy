@@ -5,7 +5,7 @@ os=${OSTYPE//[0-9.-]*/}
 case "$os" in
   darwin)
     echo "Running for Mac"
-    ./build/Darwin/release/release/bin/mutexd \
+    ./build/Darwin/master/release/bin/mutexd \
     --limit-rate=10000000 \
     --out-peers=15 \
     --in-peers=15 \

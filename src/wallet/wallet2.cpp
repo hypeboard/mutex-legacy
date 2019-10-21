@@ -3398,7 +3398,7 @@ bool wallet2::get_rct_distribution(uint64_t &start_height, std::vector<uint64_t>
   req.binary = true;
   req.compress = true;
   m_daemon_rpc_mutex.lock();
-  bool r = invoke_http_bin("/get_output_distribution.bin", req, res, rpc_timeout);
+  bool r = invoke_http_bin("/get_output_distribution.bin", req, res, rpc_timeout * 1000);
   m_daemon_rpc_mutex.unlock();
   if (!r)
   {
