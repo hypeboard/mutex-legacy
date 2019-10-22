@@ -634,8 +634,8 @@ namespace rct {
         ge_p3_tobytes(pointk.bytes, &res);
         return pointk;
     }    
-
-   key hashToPoint(const key & hh) {
+    
+    key hashToPoint(const key & hh) {
         key pointk;
         ge_p2 point;
         ge_p1p1 point2;
@@ -646,17 +646,6 @@ namespace rct {
         ge_p1p1_to_p3(&res, &point2);        
         ge_p3_tobytes(pointk.bytes, &res);
         return pointk;
-    }
-
-    
-    // Hash a key to p3 representation
-    void hash_to_p3(ge_p3 &hash8_p3, const key &k) {
-      key hash_key = cn_fast_hash(k);
-      ge_p2 hash_p2;
-      ge_fromfe_frombytes_vartime(&hash_p2, hash_key.bytes);
-      ge_p1p1 hash8_p1p1;
-      ge_mul8(&hash8_p1p1, &hash_p2);
-      ge_p1p1_to_p3(&hash8_p3, &hash8_p1p1);
     }
 
     void hashToPoint(key & pointk, const key & hh) {
