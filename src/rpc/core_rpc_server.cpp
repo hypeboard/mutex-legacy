@@ -105,35 +105,6 @@ namespace cryptonote
     , m_p2p(p2p)
   {}
   //------------------------------------------------------------------------------------------------------------------------------
-  bool core_rpc_server::set_bootstrap_daemon(const std::string &address, const std::string &username_password)
-  {
-    boost::optional<epee::net_utils::http::login> credentials;
-    const auto loc = username_password.find(':');
-    if (loc != std::string::npos)
-    {
-      credentials = epee::net_utils::http::login(username_password.substr(0, loc), username_password.substr(loc + 1));
-    }
-    return set_bootstrap_daemon(address, credentials);
-  }
-  //------------------------------------------------------------------------------------------------------------------------------
-  bool core_rpc_server::set_bootstrap_daemon(const std::string &address, const boost::optional<epee::net_utils::http::login> &credentials)
-  {
-    boost::unique_lock<boost::shared_mutex> lock(m_bootstrap_daemon_mutex);
-
-    if (!address.empty())
-    {
-      if (!m_http_client.set_server(address, credentials, epee::net_utils::ssl_support_t::e_ssl_support_autodetect))
-      {
-        return false;
-      }
-    }
-
-    m_bootstrap_daemon_address = address;   
-    m_should_use_bootstrap_daemon = !m_bootstrap_daemon_address.empty();
-
-    return true;
-  }
-  //------------------------------------------------------------------------------------------------------------------------------
   bool core_rpc_server::init(
       const boost::program_options::variables_map& vm
       , const bool restricted
@@ -147,12 +118,29 @@ namespace cryptonote
     if (!rpc_config)
       return false;
 
-    if (!set_bootstrap_daemon(command_line::get_arg(vm, arg_bootstrap_daemon_address),
-      command_line::get_arg(vm, arg_bootstrap_daemon_login)))
+    m_bootstrap_daemon_address = command_line::get_arg(vm, arg_bootstrap_daemon_address);
+    if (!m_bootstrap_daemon_address.empty())
     {
-      MERROR("Failed to parse bootstrap daemon address");
-      return false;
+      const std::string &bootstrap_daemon_login = command_line::get_arg(vm, arg_bootstrap_daemon_login);
+      const auto loc = bootstrap_daemon_login.find(':');
+      if (!bootstrap_daemon_login.empty() && loc != std::string::npos)
+      {
+        epee::net_utils::http::login login;
+        login.username = bootstrap_daemon_login.substr(0, loc);
+        login.password = bootstrap_daemon_login.substr(loc + 1);
+        m_http_client.set_server(m_bootstrap_daemon_address, login, epee::net_utils::ssl_support_t::e_ssl_support_autodetect);
+      }
+      else
+      {
+        m_http_client.set_server(m_bootstrap_daemon_address, boost::none, epee::net_utils::ssl_support_t::e_ssl_support_autodetect);
+      }
+      m_should_use_bootstrap_daemon = true;
     }
+    else
+    {
+      m_should_use_bootstrap_daemon = false;
+    }
+    m_was_bootstrap_ever_used = false;
 
     boost::optional<epee::net_utils::http::login> http_login{};
 
@@ -197,10 +185,7 @@ namespace cryptonote
     bool r;
     if (use_bootstrap_daemon_if_necessary<COMMAND_RPC_GET_INFO>(invoke_http_mode::JON, "/getinfo", req, res, r))
     {
-      {
-        boost::shared_lock<boost::shared_mutex> lock(m_bootstrap_daemon_mutex);
-        res.bootstrap_daemon_address = m_bootstrap_daemon_address;
-      }
+      res.bootstrap_daemon_address = m_bootstrap_daemon_address;
       crypto::hash top_hash;
       m_core.get_blockchain_top(res.height_without_bootstrap, top_hash);
       ++res.height_without_bootstrap; // turn top block height into blockchain height
@@ -239,16 +224,13 @@ namespace cryptonote
     res.start_time = restricted ? 0 : (uint64_t)m_core.get_start_time();
     res.free_space = restricted ? std::numeric_limits<uint64_t>::max() : m_core.get_free_space();
     res.offline = m_core.offline();
+    res.bootstrap_daemon_address = restricted ? "" : m_bootstrap_daemon_address;
     res.height_without_bootstrap = restricted ? 0 : res.height;
     if (restricted)
-    {
-      res.bootstrap_daemon_address = "";
       res.was_bootstrap_ever_used = false;
-    }
     else
     {
       boost::shared_lock<boost::shared_mutex> lock(m_bootstrap_daemon_mutex);
-      res.bootstrap_daemon_address = m_bootstrap_daemon_address;
       res.was_bootstrap_ever_used = m_was_bootstrap_ever_used;
     }
     res.database_size = m_core.get_blockchain_storage().get_db().get_database_size();
@@ -1154,28 +1136,6 @@ namespace cryptonote
     return true;
   }
   //------------------------------------------------------------------------------------------------------------------------------
-  bool core_rpc_server::on_set_bootstrap_daemon(const COMMAND_RPC_SET_BOOTSTRAP_DAEMON::request& req, COMMAND_RPC_SET_BOOTSTRAP_DAEMON::response& res, const connection_context *ctx)
-  {
-    PERF_TIMER(on_set_bootstrap_daemon);
-
-    boost::optional<epee::net_utils::http::login> credentials;
-    if (!req.username.empty() || !req.password.empty())
-    {
-      credentials = epee::net_utils::http::login(req.username, req.password);
-    }
-    
-    if (set_bootstrap_daemon(req.address, credentials))
-    {
-      res.status = CORE_RPC_STATUS_OK;
-    }
-    else
-    {
-      res.status = "Failed to set bootstrap daemon";
-    }    
-
-    return true;
-  }
-  //------------------------------------------------------------------------------------------------------------------------------
   bool core_rpc_server::on_stop_daemon(const COMMAND_RPC_STOP_DAEMON::request& req, COMMAND_RPC_STOP_DAEMON::response& res, const connection_context *ctx)
   {
     PERF_TIMER(on_stop_daemon);
@@ -1302,18 +1262,6 @@ namespace cryptonote
       error_resp.message = "Internal error: failed to create block template";
       LOG_ERROR("Failed to create block template");
       return false;
-    }
-    if (b.major_version >= RX_BLOCK_VERSION)
-    {
-      uint64_t seed_height, next_height;
-      crypto::hash seed_hash;
-      crypto::rx_seedheights(res.height, &seed_height, &next_height);
-      seed_hash = m_core.get_block_id_by_height(seed_height);
-      res.seed_hash = string_tools::pod_to_hex(seed_hash);
-      if (next_height != seed_height) {
-        seed_hash = m_core.get_block_id_by_height(next_height);
-        res.next_seed_hash = string_tools::pod_to_hex(seed_hash);
-      }
     }
     store_difficulty(wdiff, res.difficulty, res.wide_difficulty, res.difficulty_top64);
     blobdata block_blob = t_serializable_object_to_blob(b);
@@ -1457,7 +1405,7 @@ namespace cryptonote
         return false;
       }
       b.nonce = req.starting_nonce;
-      miner::find_nonce_for_given_block(&(m_core.get_blockchain_storage()), b, template_res.difficulty, template_res.height);
+      miner::find_nonce_for_given_block(b, template_res.difficulty, template_res.height);
 
       submit_req.front() = string_tools::buff_to_hex_nodelimer(block_to_blob(b));
       r = on_submitblock(submit_req, submit_res, error_resp, ctx);
@@ -1502,7 +1450,7 @@ namespace cryptonote
     response.reward = get_block_reward(blk);
     response.block_size = response.block_weight = m_core.get_blockchain_storage().get_db().get_block_weight(height);
     response.num_txes = blk.tx_hashes.size();
-    response.pow_hash = fill_pow_hash ? string_tools::pod_to_hex(get_block_longhash(&(m_core.get_blockchain_storage()), blk, height, 0)) : "";
+    response.pow_hash = fill_pow_hash ? string_tools::pod_to_hex(get_block_longhash(blk, height)) : "";
     response.long_term_weight = m_core.get_blockchain_storage().get_db().get_block_long_term_weight(height);
     response.miner_tx_hash = string_tools::pod_to_hex(cryptonote::get_transaction_hash(blk.miner_tx));
     return true;
@@ -1512,12 +1460,10 @@ namespace cryptonote
   bool core_rpc_server::use_bootstrap_daemon_if_necessary(const invoke_http_mode &mode, const std::string &command_name, const typename COMMAND_TYPE::request& req, typename COMMAND_TYPE::response& res, bool &r)
   {
     res.untrusted = false;
-
-    boost::upgrade_lock<boost::shared_mutex> upgrade_lock(m_bootstrap_daemon_mutex);
-
     if (m_bootstrap_daemon_address.empty())
       return false;
 
+    boost::unique_lock<boost::shared_mutex> lock(m_bootstrap_daemon_mutex);
     if (!m_should_use_bootstrap_daemon)
     {
       MINFO("The local daemon is fully synced. Not switching back to the bootstrap daemon");
@@ -1527,10 +1473,7 @@ namespace cryptonote
     auto current_time = std::chrono::system_clock::now();
     if (current_time - m_bootstrap_height_check_time > std::chrono::seconds(30))  // update every 30s
     {
-      {
-        boost::upgrade_to_unique_lock<boost::shared_mutex> lock(upgrade_lock);
-        m_bootstrap_height_check_time = current_time;
-      }
+      m_bootstrap_height_check_time = current_time;
 
       uint64_t top_height;
       crypto::hash top_hash;
@@ -1544,7 +1487,7 @@ namespace cryptonote
       ok = ok && getheight_res.status == CORE_RPC_STATUS_OK;
 
       m_should_use_bootstrap_daemon = ok && top_height + 10 < getheight_res.height;
-      MINFO((m_should_use_bootstrap_daemon ? "Using" : "Not using") << " the bootstrap daemon (our height: " << top_height << ", bootstrap daemon's height: " << (ok ? getheight_res.height : 0) << ")");
+      MINFO((m_should_use_bootstrap_daemon ? "Using" : "Not using") << " the bootstrap daemon (our height: " << top_height << ", bootstrap daemon's height: " << getheight_res.height << ")");
     }
     if (!m_should_use_bootstrap_daemon)
       return false;
@@ -1574,12 +1517,7 @@ namespace cryptonote
       MERROR("Unknown invoke_http_mode: " << mode);
       return false;
     }
-
-    {
-      boost::upgrade_to_unique_lock<boost::shared_mutex> lock(upgrade_lock);
-      m_was_bootstrap_ever_used = true;
-    }
-
+    m_was_bootstrap_ever_used = true;
     r = r && res.status == CORE_RPC_STATUS_OK;
     res.untrusted = true;
     return true;
@@ -1845,59 +1783,19 @@ namespace cryptonote
     PERF_TIMER(on_get_bans);
 
     auto now = time(nullptr);
-    std::map<epee::net_utils::network_address, time_t> blocked_hosts = m_p2p.get_blocked_hosts();
-    for (std::map<epee::net_utils::network_address, time_t>::const_iterator i = blocked_hosts.begin(); i != blocked_hosts.end(); ++i)
+    std::map<std::string, time_t> blocked_hosts = m_p2p.get_blocked_hosts();
+    for (std::map<std::string, time_t>::const_iterator i = blocked_hosts.begin(); i != blocked_hosts.end(); ++i)
     {
       if (i->second > now) {
         COMMAND_RPC_GETBANS::ban b;
-        b.host = i->first.host_str();
+        b.host = i->first;
         b.ip = 0;
         uint32_t ip;
-        if (epee::string_tools::get_ip_int32_from_string(ip, b.host))
+        if (epee::string_tools::get_ip_int32_from_string(ip, i->first))
           b.ip = ip;
         b.seconds = i->second - now;
         res.bans.push_back(b);
       }
-    }
-    std::map<epee::net_utils::ipv4_network_subnet, time_t> blocked_subnets = m_p2p.get_blocked_subnets();
-    for (std::map<epee::net_utils::ipv4_network_subnet, time_t>::const_iterator i = blocked_subnets.begin(); i != blocked_subnets.end(); ++i)
-    {
-      if (i->second > now) {
-        COMMAND_RPC_GETBANS::ban b;
-        b.host = i->first.host_str();
-        b.ip = 0;
-        b.seconds = i->second - now;
-        res.bans.push_back(b);
-      }
-    }
-
-    res.status = CORE_RPC_STATUS_OK;
-    return true;
-  }
-  //------------------------------------------------------------------------------------------------------------------------------
-  bool core_rpc_server::on_banned(const COMMAND_RPC_BANNED::request& req, COMMAND_RPC_BANNED::response& res, epee::json_rpc::error& error_resp, const connection_context *ctx)
-  {
-    PERF_TIMER(on_banned);
-
-    auto na_parsed = net::get_network_address(req.address, 0);
-    if (!na_parsed)
-    {
-      error_resp.code = CORE_RPC_ERROR_CODE_WRONG_PARAM;
-      error_resp.message = "Unsupported host type";
-      return false;
-    }
-    epee::net_utils::network_address na = std::move(*na_parsed);
-
-    time_t seconds;
-    if (m_p2p.is_host_blocked(na, &seconds))
-    {
-      res.banned = true;
-      res.seconds = seconds;
-    }
-    else
-    {
-      res.banned = false;
-      res.seconds = 0;
     }
 
     res.status = CORE_RPC_STATUS_OK;
@@ -1911,29 +1809,13 @@ namespace cryptonote
     for (auto i = req.bans.begin(); i != req.bans.end(); ++i)
     {
       epee::net_utils::network_address na;
-
-      // try subnet first
-      if (!i->host.empty())
-      {
-        auto ns_parsed = net::get_ipv4_subnet_address(i->host);
-        if (ns_parsed)
-        {
-          if (i->ban)
-            m_p2p.block_subnet(*ns_parsed, i->seconds);
-          else
-            m_p2p.unblock_subnet(*ns_parsed);
-          continue;
-        }
-      }
-
-      // then host
       if (!i->host.empty())
       {
         auto na_parsed = net::get_network_address(i->host, 0);
         if (!na_parsed)
         {
           error_resp.code = CORE_RPC_ERROR_CODE_WRONG_PARAM;
-          error_resp.message = "Unsupported host/subnet type";
+          error_resp.message = "Unsupported host type";
           return false;
         }
         na = std::move(*na_parsed);
@@ -2168,9 +2050,7 @@ namespace cryptonote
   bool core_rpc_server::on_out_peers(const COMMAND_RPC_OUT_PEERS::request& req, COMMAND_RPC_OUT_PEERS::response& res, const connection_context *ctx)
   {
     PERF_TIMER(on_out_peers);
-    if (req.set)
-      m_p2p.change_max_out_public_peers(req.out_peers);
-    res.out_peers = m_p2p.get_max_out_public_peers();
+    m_p2p.change_max_out_public_peers(req.out_peers);
     res.status = CORE_RPC_STATUS_OK;
     return true;
   }
@@ -2178,11 +2058,25 @@ namespace cryptonote
   bool core_rpc_server::on_in_peers(const COMMAND_RPC_IN_PEERS::request& req, COMMAND_RPC_IN_PEERS::response& res, const connection_context *ctx)
   {
     PERF_TIMER(on_in_peers);
-    if (req.set)
-      m_p2p.change_max_in_public_peers(req.in_peers);
-    res.in_peers = m_p2p.get_max_in_public_peers();
+    m_p2p.change_max_in_public_peers(req.in_peers);
     res.status = CORE_RPC_STATUS_OK;
     return true;
+  }
+  //------------------------------------------------------------------------------------------------------------------------------
+  bool core_rpc_server::on_start_save_graph(const COMMAND_RPC_START_SAVE_GRAPH::request& req, COMMAND_RPC_START_SAVE_GRAPH::response& res, const connection_context *ctx)
+  {
+	  PERF_TIMER(on_start_save_graph);
+	  m_p2p.set_save_graph(true);
+	  res.status = CORE_RPC_STATUS_OK;
+	  return true;
+  }
+  //------------------------------------------------------------------------------------------------------------------------------
+  bool core_rpc_server::on_stop_save_graph(const COMMAND_RPC_STOP_SAVE_GRAPH::request& req, COMMAND_RPC_STOP_SAVE_GRAPH::response& res, const connection_context *ctx)
+  {
+	  PERF_TIMER(on_stop_save_graph);
+	  m_p2p.set_save_graph(false);
+	  res.status = CORE_RPC_STATUS_OK;
+	  return true;
   }
   //------------------------------------------------------------------------------------------------------------------------------
   bool core_rpc_server::on_update(const COMMAND_RPC_UPDATE::request& req, COMMAND_RPC_UPDATE::response& res, const connection_context *ctx)
