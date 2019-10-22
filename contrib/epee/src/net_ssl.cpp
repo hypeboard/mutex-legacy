@@ -28,11 +28,9 @@
 
 #include <string.h>
 #include <boost/asio/ssl.hpp>
-#include <boost/lambda/lambda.hpp>
 #include <openssl/ssl.h>
 #include <openssl/pem.h>
 #include "misc_log_ex.h"
-#include "net/net_helper.h"
 #include "net/net_ssl.h"
 
 #undef MONERO_DEFAULT_LOG_CATEGORY
@@ -458,11 +456,7 @@ bool ssl_options_t::has_fingerprint(boost::asio::ssl::verify_context &ctx) const
   return false;
 }
 
-bool ssl_options_t::handshake(
-  boost::asio::ssl::stream<boost::asio::ip::tcp::socket> &socket,
-  boost::asio::ssl::stream_base::handshake_type type,
-  const std::string& host,
-  std::chrono::milliseconds timeout) const
+bool ssl_options_t::handshake(boost::asio::ssl::stream<boost::asio::ip::tcp::socket> &socket, boost::asio::ssl::stream_base::handshake_type type, const std::string& host) const
 {
   socket.next_layer().set_option(boost::asio::ip::tcp::no_delay(true));
 
@@ -508,23 +502,8 @@ bool ssl_options_t::handshake(
     });
   }
 
-  auto& io_service = GET_IO_SERVICE(socket);
-  boost::asio::steady_timer deadline(io_service, timeout);
-  deadline.async_wait([&socket](const boost::system::error_code& error) {
-    if (error != boost::asio::error::operation_aborted)
-    {
-      socket.next_layer().close();
-    }
-  });
-
-  boost::system::error_code ec = boost::asio::error::would_block;
-  socket.async_handshake(type, boost::lambda::var(ec) = boost::lambda::_1);
-  while (ec == boost::asio::error::would_block)
-  {
-    io_service.reset();
-    io_service.run_one();
-  }
-
+  boost::system::error_code ec;
+  socket.handshake(type, ec);
   if (ec)
   {
     MERROR("SSL handshake failed, connection dropped: " << ec.message());
