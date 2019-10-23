@@ -718,6 +718,7 @@ namespace rct {
     //   Note: For txn fees, the last index in the amounts vector should contain that
     //   Thus the amounts vector will be "one" longer than the destinations vectort
     rctSig genRct(const key &message, const ctkeyV & inSk, const keyV & destinations, const vector<xmr_amount> & amounts, const ctkeyM &mixRing, const keyV &amount_keys, const multisig_kLRki *kLRki, multisig_out *msout, unsigned int index, ctkeyV &outSk, const RCTConfig &rct_config, hw::device &hwdev) {
+        const bool bulletproof = rct_config.range_proof_type != RangeProofBorromean;
         CHECK_AND_ASSERT_THROW_MES(amounts.size() == destinations.size() || amounts.size() == destinations.size() + 1, "Different number of amounts/destinations");
         CHECK_AND_ASSERT_THROW_MES(amount_keys.size() == destinations.size(), "Different number of amount_keys/destinations");
         CHECK_AND_ASSERT_THROW_MES(index < mixRing.size(), "Bad index into mixRing");
@@ -731,7 +732,8 @@ namespace rct {
         rv.type = bulletproof ? RCTTypeFullBulletproof : RCTTypeFull;
         rv.message = message;
         rv.outPk.resize(destinations.size());
-        rv.p.rangeSigs.resize(destinations.size());
+        if (!bulletproof)
+            rv.p.rangeSigs.resize(destinations.size());
         rv.ecdhInfo.resize(destinations.size());
 
         size_t i = 0;
@@ -741,7 +743,10 @@ namespace rct {
             //add destination to sig
             rv.outPk[i].dest = copy(destinations[i]);
             //compute range proof
-            rv.p.rangeSigs[i] = proveRange(rv.outPk[i].mask, outSk[i].mask, amounts[i]);
+            if (!bulletproof)
+            {
+                rv.p.rangeSigs[i] = proveRange(rv.outPk[i].mask, outSk[i].mask, amounts[i]);
+
             #ifdef DBG
             CHECK_AND_ASSERT_THROW_MES(verRange(rv.outPk[i].mask, rv.p.rangeSigs[i]), "verRange failed on newly created proof");
             #endif
@@ -1165,9 +1170,12 @@ namespace rct {
           CHECK_AND_ASSERT_MES(rv.type == RCTTypeSimple || rv.type == RCTTypeBulletproof || rv.type == RCTTypeBulletproof2 || rv.type == RCTTypeSimpleBulletproof,
               false, "verRctSemanticsSimple called on non simple rctSig");
           const bool bulletproof = is_rct_bulletproof(rv.type);
-          if (bulletproof)
+          if (rv.type == RCTTypeBulletproof)
           {
             CHECK_AND_ASSERT_MES(rv.outPk.size() == n_bulletproof_amounts(rv.p.bulletproofs), false, "Mismatched sizes of outPk and bulletproofs");
+          }
+          else if (bulletproof)
+          {
             CHECK_AND_ASSERT_MES(rv.p.pseudoOuts.size() == rv.p.MGs.size(), false, "Mismatched sizes of rv.p.pseudoOuts and rv.p.MGs");
             CHECK_AND_ASSERT_MES(rv.pseudoOuts.empty(), false, "rv.pseudoOuts is not empty");
           }
@@ -1221,12 +1229,23 @@ namespace rct {
             offset += rv.p.rangeSigs.size();
           }
         }
+        for (const rctSig *rvp: rvv)
+        {
+          const rctSig &rv = *rvp;
+        if (!rct::is_rct_new_bulletproof(rv.type)){
+        if (!proofs.empty() && !verBulletproof_old(proofs))
+        {
+          LOG_PRINT_L1("Aggregate range proof verified failed");
+          return false;
+        }
+        } else {
         if (!proofs.empty() && !verBulletproof(proofs))
         {
           LOG_PRINT_L1("Aggregate range proof verified failed");
           return false;
         }
-
+        }
+        }
         waiter.wait(&tpool);
         for (size_t i = 0; i < results.size(); ++i) {
           if (!results[i]) {

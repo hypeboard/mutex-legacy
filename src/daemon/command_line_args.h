@@ -122,11 +122,6 @@ namespace daemon_args
     }
   };
 
-  const command_line::arg_descriptor<bool> arg_zmq_rpc_disabled = {
-    "no-zmq"
-  , "Disable ZMQ RPC server"
-  };
-
 }  // namespace daemon_args
 
 #endif // DAEMON_COMMAND_LINE_ARGS_H

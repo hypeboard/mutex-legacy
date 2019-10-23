@@ -494,14 +494,11 @@ bool t_command_parser_executor::set_limit_down(const std::vector<std::string>& a
 
 bool t_command_parser_executor::out_peers(const std::vector<std::string>& args)
 {
-	bool set = false;
-	uint32_t limit = 0;
+	if (args.empty()) return false;
+	
+	unsigned int limit;
 	try {
-		if (!args.empty())
-		{
-			limit = std::stoi(args[0]);
-			set = true;
-		}
+		limit = std::stoi(args[0]);
 	}
 	  
 	catch(const std::exception& ex) {
@@ -509,19 +506,16 @@ bool t_command_parser_executor::out_peers(const std::vector<std::string>& args)
 		return false;
 	}
 	
-	return m_executor.out_peers(set, limit);
+	return m_executor.out_peers(limit);
 }
 
 bool t_command_parser_executor::in_peers(const std::vector<std::string>& args)
 {
-	bool set = false;
-	uint32_t limit = 0;
+	if (args.empty()) return false;
+
+	unsigned int limit;
 	try {
-		if (!args.empty())
-		{
-			limit = std::stoi(args[0]);
-			set = true;
-		}
+		limit = std::stoi(args[0]);
 	}
 
 	catch(const std::exception& ex) {
@@ -529,7 +523,19 @@ bool t_command_parser_executor::in_peers(const std::vector<std::string>& args)
 		return false;
 	}
 
-	return m_executor.in_peers(set, limit);
+	return m_executor.in_peers(limit);
+}
+
+bool t_command_parser_executor::start_save_graph(const std::vector<std::string>& args)
+{
+	if (!args.empty()) return false;
+	return m_executor.start_save_graph();
+}
+
+bool t_command_parser_executor::stop_save_graph(const std::vector<std::string>& args)
+{
+	if (!args.empty()) return false;
+	return m_executor.stop_save_graph();
 }
 
 bool t_command_parser_executor::hard_fork_info(const std::vector<std::string>& args)
@@ -588,13 +594,6 @@ bool t_command_parser_executor::unban(const std::vector<std::string>& args)
   if (args.size() != 1) return false;
   std::string ip = args[0];
   return m_executor.unban(ip);
-}
-
-bool t_command_parser_executor::banned(const std::vector<std::string>& args)
-{
-  if (args.size() != 1) return false;
-  std::string address = args[0];
-  return m_executor.banned(address);
 }
 
 bool t_command_parser_executor::flush_txpool(const std::vector<std::string>& args)

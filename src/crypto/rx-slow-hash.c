@@ -197,7 +197,7 @@ typedef struct seedinfo {
 static CTHR_THREAD_RTYPE rx_seedthread(void *arg) {
   seedinfo *si = arg;
   randomx_init_dataset(rx_dataset, si->si_cache, si->si_start, si->si_count);
-  CTHR_THREAD_RETURN;
+  return NULL;
 }
 
 static void rx_initdata(randomx_cache *rs_cache, const int miners) {
@@ -276,7 +276,7 @@ void rx_alt_slowhash(const uint64_t mainheight, const uint64_t seedheight, const
   uint64_t s_height = rx_seedheight(mainheight);
   int alt_toggle = (s_height & SEEDHASH_EPOCH_BLOCKS) == 0;
   rx_state *rx_sp = &rx_s[alt_toggle];
-  if (rx_sp->rs_height != seedheight || rx_sp->rs_cache == NULL || memcmp(seedhash, rx_althash, sizeof(rx_althash))) {
+  if (rx_sp->rs_height != seedheight || rx_sp->rs_cache == NULL || memcmp(hash, rx_althash, sizeof(rx_althash))) {
     memcpy(rx_althash, seedhash, sizeof(rx_althash));
     rx_sp->rs_height = 1;
     rx_seedhash_int(rx_sp, seedheight, seedhash, 0);
@@ -345,12 +345,5 @@ void rx_slow_hash_free_state(void) {
   if (rx_vm != NULL) {
     randomx_destroy_vm(rx_vm);
     rx_vm = NULL;
-  }
-}
-
-void rx_stop_mining(void) {
-  if (rx_dataset != NULL) {
-    randomx_release_dataset(rx_dataset);
-	rx_dataset = NULL;
   }
 }

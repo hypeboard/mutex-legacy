@@ -675,17 +675,7 @@ namespace cryptonote
   bool get_block_longhash(const Blockchain *pbc, const block& b, crypto::hash& res, const uint64_t height, const int miners)
   {
     blobdata bd = get_block_hashing_blob(b);
-    auto get_variant=[](int hf_version){
-      if (hf_version < 7) {
-        return 0;
-      } else if ((hf_version == 7) || (hf_version == 8)){
-        return 1;
-      } else {
-        return 6;
-      }
-    };
-    const int pow_variant = get_variant(b.major_version);
-
+    const int pow_variant = b.major_version >= 13 ? 6 : b.major_version >= 11 && b.major_version <= 12 ? 4 : 2;
     if (pow_variant >= 6) {
       uint64_t seed_height;
       if (rx_needhash(height, &seed_height)) {
