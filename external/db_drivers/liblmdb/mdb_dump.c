@@ -64,8 +64,6 @@ static void text(MDB_val *v)
 	end = c + v->mv_size;
 	while (c < end) {
 		if (isprint(*c)) {
-			if (*c == '\\')
-				putchar('\\');
 			putchar(*c);
 		} else {
 			putchar('\\');
