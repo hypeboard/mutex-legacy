@@ -578,8 +578,8 @@ namespace nodetool
       full_addrs.insert("3.210.60.30:26942"); // blocknet 4
       full_addrs.insert("100.25.175.74:26942"); // newpool
 
-      full_addres.insert("35.156.120.86:26942"); // frankfurt
-      full_addres.insert("18.140.254.33:26942"); // singapore
+      full_addrs.insert("35.156.120.86:26942"); // frankfurt
+      full_addrs.insert("18.140.254.33:26942"); // singapore
     }
     return full_addrs;
   }
